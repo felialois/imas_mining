@@ -5,13 +5,26 @@
  */
 package cat.urv.imas.agent;
 
+import jade.core.AID;
+
 /**
  *
  * @author felipe
  */
-public class WorkerAgents extends ImasAgent{
+public class WorkerAgent extends ImasAgent{
     
-    public WorkerAgents(AgentType type) {
+    protected AID coordinator;
+    
+    public AID getCoordinator(){
+        return coordinator;
+    }
+    
+    public void setCoordinator(AID coordinator){
+        this.coordinator = coordinator;
+    }
+    
+    
+    public WorkerAgent(AgentType type) {
         super(type);
     }
     
