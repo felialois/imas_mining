@@ -18,7 +18,9 @@
 package cat.urv.imas.onthology;
 
 import cat.urv.imas.agent.AgentType;
+import cat.urv.imas.agent.UtilsAgents;
 import cat.urv.imas.map.*;
+import jade.wrapper.AgentContainer;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,8 +65,8 @@ public class InitialGameSettings extends GameSettings {
     public static final int F = -4;
 
     /**
-     * City initialMap. Each number is a cell. The type of each is expressed by a
-     * constant (if a letter, see above), or a building (indicating the number
+     * City initialMap. Each number is a cell. The type of each is expressed by
+     * a constant (if a letter, see above), or a building (indicating the number
      * of people in that building).
      */
     private int[][] initialMap
@@ -88,16 +90,16 @@ public class InitialGameSettings extends GameSettings {
                 {F, P, P, MCC, F, P, P, F, F, P, P, F, F, P, P, F, F, P, P, F},
                 {F, P, PC, P, DC, P, P, F, F, P, P, P, P, P, P, F, F, P, P, F},
                 {F, P, P, P, P, P, P, F, F, P, P, P, P, P, P, F, F, DC, P, F},
-                {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F},
-            };
+                {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F},};
 
     /**
      * Number of initial elements to put in the map.
      */
     private int numberInitialElements = 0;
     /**
-     * Number of those initial elements which will be visible from
-     * the very beginning. At maximum, this value will be numberInitialElements.
+     * Number of those initial elements which will be visible from the very
+     * beginning. At maximum, this value will be numberInitialElements.
+     *
      * @see numberInitialElements
      */
     private int numberVisibleInitialElements = 0;
@@ -153,6 +155,7 @@ public class InitialGameSettings extends GameSettings {
 
     /**
      * Initializes the cell map.
+     *
      * @throws Exception if some error occurs when adding agents.
      */
     private void initMap() throws Exception {
@@ -228,7 +231,7 @@ public class InitialGameSettings extends GameSettings {
         }
         int availableCells = getNumberOfCellsOfType(CellType.FIELD);
         if (availableCells < this.getNumberInitialElements()) {
-            throw new Error(getClass().getCanonicalName() + " : You set up more new initial elements ("+ this.getNumberInitialElements() +")than existing cells ("+ availableCells +").");
+            throw new Error(getClass().getCanonicalName() + " : You set up more new initial elements (" + this.getNumberInitialElements() + ")than existing cells (" + availableCells + ").");
         }
         if (0 > this.getNumberVisibleInitialElements()) {
             throw new Error(getClass().getCanonicalName() + " : Not allowed negative number of visible elements.");
@@ -240,9 +243,37 @@ public class InitialGameSettings extends GameSettings {
         int maxInitial = this.getNumberInitialElements();
         int maxVisible = this.getNumberVisibleInitialElements();
 
+        createAgents(this.agentList);
         addElements(maxInitial, maxVisible);
     }
 
+    public void createAgents(Map<AgentType, List<Cell>> map) {
+        
+        AgentContainer diggerContainer = UtilsAgents.createContainer();
+        AgentContainer prospectorContainer = UtilsAgents.createContainer();
+        UtilsAgents.createAgent(prospectorContainer,"prscrd", "cat.urv.imas.agent.ProspectorCoordinatorAgent", new Object[0]);
+        UtilsAgents.createAgent(diggerContainer,"dggcrd", "cat.urv.imas.agent.DiggerCoordinatorAgent", new Object[0]);
+
+        for (Map.Entry<AgentType, List<Cell>> entry : map.entrySet()) {
+            int i = 0;
+
+            for (Cell a : entry.getValue()) {
+                switch (entry.getKey()) {
+                    case PROSPECTOR:
+                        UtilsAgents.createAgent(prospectorContainer,"prs" + i, "cat.urv.imas.agent.ProspectorAgent", new Object[0]);
+                        break;
+                    case DIGGER:
+                        UtilsAgents.createAgent(diggerContainer,"dgg" + i, "cat.urv.imas.agent.DiggerAgent", new Object[0]);
+                        break;
+                    default:
+                        break;
+                }
+                i++;
+
+            }
+        }
+
+    }
 
     public void addElements(int maxElements, int maxVisible) {
         CellType ctype = CellType.FIELD;
@@ -262,9 +293,9 @@ public class InitialGameSettings extends GameSettings {
             throw new Error(getClass().getCanonicalName() + " : More visible elements than number of elements.");
         }
 
-        System.out.println(getClass().getCanonicalName() + " : Adding " + maxElements +
-                " elements (" + maxVisible + " of them visible) on a map with " +
-                maxCells + " cells (" + freeCells + " of them candidate).");
+        System.out.println(getClass().getCanonicalName() + " : Adding " + maxElements
+                + " elements (" + maxVisible + " of them visible) on a map with "
+                + maxCells + " cells (" + freeCells + " of them candidate).");
 
         if (0 == maxElements) {
             return;
@@ -282,14 +313,14 @@ public class InitialGameSettings extends GameSettings {
         Set<Integer> visibleSet = new TreeSet();
         Object[] initialCells = initialSet.toArray();
         while (visibleSet.size() < maxVisible) {
-            visibleSet.add((Integer)initialCells[numberGenerator.nextInt(maxElements)]);
+            visibleSet.add((Integer) initialCells[numberGenerator.nextInt(maxElements)]);
         }
 
         MetalType[] types = MetalType.values();
         MetalType type;
         int amount;
         boolean visible;
-        for (int i: initialSet) {
+        for (int i : initialSet) {
             type = types[numberGenerator.nextInt(types.length)];
             amount = numberGenerator.nextInt(this.getMaxAmountOfNewMetal()) + 1;
             visible = visibleSet.contains(i);
@@ -299,23 +330,25 @@ public class InitialGameSettings extends GameSettings {
 
     /**
      * Tells whether the given cell is empty of elements.
+     *
      * @param ncell nuber of cell.
      * @return true when empty.
      */
     private boolean isEmpty(int ncell) {
-        return ((SettableFieldCell)cellsOfType.get(CellType.FIELD).get(ncell)).isEmpty();
+        return ((SettableFieldCell) cellsOfType.get(CellType.FIELD).get(ncell)).isEmpty();
     }
 
     /**
      * Set up the amount of elements of the given type on the cell specified by
      * ncell. It will be visible whenever stated.
+     *
      * @param type type of elements to put in the map.
      * @param amount amount of elements to put into.
      * @param ncell number of cell from a given list.
      * @param visible visible to agents?
      */
     private void setElements(MetalType type, int amount, boolean visible, int ncell) {
-        SettableFieldCell cell = (SettableFieldCell)cellsOfType.get(CellType.FIELD).get(ncell);
+        SettableFieldCell cell = (SettableFieldCell) cellsOfType.get(CellType.FIELD).get(ncell);
         cell.setElements(type, amount);
         if (visible) {
             cell.detectMetal();
@@ -323,24 +356,24 @@ public class InitialGameSettings extends GameSettings {
     }
 
     /**
-     * Process the request of adding new elements onto the map to be run
-     * every simulation step.
+     * Process the request of adding new elements onto the map to be run every
+     * simulation step.
      *
-     * Mainly, it checks the probability of having new elements. If so,
-     * it finds the number of cells with new elements, to finally add
-     * new elements to the given number of cells.
+     * Mainly, it checks the probability of having new elements. If so, it finds
+     * the number of cells with new elements, to finally add new elements to the
+     * given number of cells.
      *
      * This process also checks that if there is room for the given number of
      * cells. Otherwise and error is thrown.
      */
     public void addElementsForThisSimulationStep() {
         int probabilityOfNewElements = this.getNewMetalProbability();
-        int stepProbability = numberGenerator.nextInt(100) +1;
+        int stepProbability = numberGenerator.nextInt(100) + 1;
 
         if (stepProbability < probabilityOfNewElements) {
-            System.out.println(getClass().getCanonicalName() + " : " + stepProbability +
-                    " < " + probabilityOfNewElements +
-                    " (step probability for new elements < probability of new elements)");
+            System.out.println(getClass().getCanonicalName() + " : " + stepProbability
+                    + " < " + probabilityOfNewElements
+                    + " (step probability for new elements < probability of new elements)");
             return;
         }
 

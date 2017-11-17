@@ -17,7 +17,7 @@ import jade.domain.FIPAException;
  */
 public class ProspectorAgent extends WorkerAgent{
     
-    public ProspectorAgent(AgentType type) {
+    public ProspectorAgent() {
         super(AgentType.PROSPECTOR);
     }
     

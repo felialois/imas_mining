@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Random;
+import java.util.ArrayList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -23,8 +24,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
+import cat.urv.imas.agent.DiggerAgent;
 /**
  * Helper for updating the game settings. To do so, just update the content of
  * the <code>defineSettings()</code> method.
@@ -33,6 +36,8 @@ public class GenerateGameSettings {
 
     private static final int STEPS = 600;
     private static final String FILENAME = "game.settings";
+    private static final String FILENAME_2 = "game.settings.runtime";
+
 
     /*
      * ********************* JUST SET YOUR SETTINGS ****************************
@@ -89,11 +94,48 @@ public class GenerateGameSettings {
             settings.setNumberInitialElements(Integer.parseInt(initialElements));
             String initialVisibleElements = doc.getElementsByTagName("numberVisibleInitialElements").item(0).getTextContent();
             settings.setNumberVisibleInitialElements(Integer.parseInt(initialVisibleElements));
+                        
+            NodeList nList = doc.getElementsByTagName("initialMap");
+                                    
+            ArrayList <ArrayList <Integer>> amap = new ArrayList<ArrayList<Integer>>();
+            ArrayList <Integer> line = new ArrayList<Integer>();
             
-            // Now we get the map
-            NodeList mapList = doc.getElementsByTagName("initialMap");
-            System.out.println(mapList.item(0));
-            int[][] map = new int[mapList.getLength()][3];
+            for(int i=0; i < nList.getLength(); i++)
+            {
+                Node nNode = nList.item(i);
+                
+                //System.out.println("\n Current element: " + nNode.getNodeName());
+                
+                if(nNode.getNodeType() == Node.ELEMENT_NODE)
+                {
+                    Element eElement = (Element) nNode;
+                    line = new ArrayList<Integer>();
+                    
+                    for(int j=0; j < eElement.getElementsByTagName("item").getLength(); j++)
+                    {
+                        line.add(Integer.parseInt(eElement.getElementsByTagName("item").item(j).getTextContent()));
+                        //System.out.println(eElement.getElementsByTagName("item").getLength());
+                        //System.out.println("Item " +i+" "+j+": " + eElement.getElementsByTagName("item").item(j).getTextContent());                        
+                    }
+                    
+                    amap.add(line);
+                }
+            }
+            
+            int [][] map = new int[amap.size()][line.size()];
+            
+            for(int i=0; i<amap.size();i++)
+            {
+                for(int j=0; j<line.size();j++)
+                {
+                    map[i][j] = amap.get(i).get(j);
+                    
+                    //System.out.println(map[i][j]);
+                }                
+            }
+            
+            settings.setInitialMap(map);
+                        
             // settings for first date
             int[][] firstMap
                 = {
@@ -118,7 +160,7 @@ public class GenerateGameSettings {
                     {F, P, P, P, P, P, P, F, F, P, P, P, P, P, P, F, F, DC, P, F},
                     {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F},
                 };
-            settings.setInitialMap(map);
+            //settings.setInitialMap(firstMap);
         } catch(IOException | ParserConfigurationException | DOMException | SAXException e) {
         }
     }
@@ -167,11 +209,11 @@ public class GenerateGameSettings {
 
             //print XML string representation of GameSettings
             try {
-                PrintWriter out = new PrintWriter(FILENAME, "UTF-8");
+                PrintWriter out = new PrintWriter(FILENAME_2, "UTF-8");
                 out.println(writer.toString());
                 out.close();
             } catch (Exception e) {
-                System.err.println("Could not create file '" + FILENAME + "'.");
+                System.err.println("Could not create file '" + FILENAME_2 + "'.");
                 System.out.println(writer.toString());
             }
 
