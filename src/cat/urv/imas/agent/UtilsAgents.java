@@ -145,5 +145,19 @@ public class UtilsAgents {
         }
         return container;
     }
+    
+    public static AgentContainer createContainer(){
+        AgentContainer container = null;
+        try {
+            Runtime rt = Runtime.instance();
+            Profile p = new ProfileImpl();
+            container = rt.createAgentContainer(p);
+
+        } catch (Exception e) {
+            System.err.println("ERROR: Cannot create container");
+            e.printStackTrace();
+        }
+        return container;
+    }
 
 }

@@ -36,6 +36,8 @@ public class GenerateGameSettings {
 
     private static final int STEPS = 600;
     private static final String FILENAME = "game.settings";
+    private static final String FILENAME_2 = "game.settings.runtime";
+
 
     /*
      * ********************* JUST SET YOUR SETTINGS ****************************
@@ -207,11 +209,11 @@ public class GenerateGameSettings {
 
             //print XML string representation of GameSettings
             try {
-                PrintWriter out = new PrintWriter(FILENAME, "UTF-8");
+                PrintWriter out = new PrintWriter(FILENAME_2, "UTF-8");
                 out.println(writer.toString());
                 out.close();
             } catch (Exception e) {
-                System.err.println("Could not create file '" + FILENAME + "'.");
+                System.err.println("Could not create file '" + FILENAME_2 + "'.");
                 System.out.println(writer.toString());
             }
 
