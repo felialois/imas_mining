@@ -51,7 +51,6 @@ public class GenerateGameSettings {
         //add here whatever settings.set* to define your new settings.
         try {
             // We start reading the file
-            File file = new File("userdata.xml");
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             Document doc = documentBuilder.parse(FILENAME);
@@ -121,7 +120,7 @@ public class GenerateGameSettings {
                     amap.add(line);
                 }
             }
-            
+            /*
             int [][] map = new int[amap.size()][line.size()];
             
             for(int i=0; i<amap.size();i++)
@@ -134,7 +133,7 @@ public class GenerateGameSettings {
                 }                
             }
             
-            settings.setInitialMap(map);
+            settings.setInitialMap(map);*/
                         
             // settings for first date
             int[][] firstMap
@@ -150,7 +149,7 @@ public class GenerateGameSettings {
                     {F, P, P, F, F, P, DC, F, F, P, P, F, F, P, P, F, F, P, P, F},
                     {F, P, P, F, F, P, P, F, F, P, P, F, F, P, P, F, F, P, P, F},
                     {F, P, P, F, F, P, P, F, F, P, P, F, F, P, P, F, F, P, P, F},
-                    {F, P, P, F, F, P, P, F, F, P, PC, F, F, P, P, F, F, P, P, F},
+                    {F, P, DC, F, F, P, P, F, F, P, PC, F, F, P, P, F, F, P, P, F},
                     {F, P, P, F, F, P, P, F, F, P, P, F, F, P, P, MCC, F, P, P, F},
                     {F, P, P, F, F, P, P, F, F, P, P, F, F, P, P, F, F, DC, P, F},
                     {F, P, P, F, F, P, P, F, F, P, P, F, F, P, P, F, F, DC, P, F},
