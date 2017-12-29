@@ -243,12 +243,11 @@ public class InitialGameSettings extends GameSettings {
         int maxInitial = this.getNumberInitialElements();
         int maxVisible = this.getNumberVisibleInitialElements();
 
-        createAgents(this.agentList);
         addElements(maxInitial, maxVisible);
     }
 
-    public void createAgents(Map<AgentType, List<Cell>> map) {
-        
+    public void createAgents() { 
+        Map<AgentType, List<Cell>> map = this.agentList;
         AgentContainer diggerContainer = UtilsAgents.createContainer();
         AgentContainer prospectorContainer = UtilsAgents.createContainer();
         UtilsAgents.createAgent(prospectorContainer,"prscrd", "cat.urv.imas.agent.ProspectorCoordinatorAgent", new Object[0]);

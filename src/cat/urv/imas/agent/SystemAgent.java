@@ -144,6 +144,9 @@ public class SystemAgent extends ImasAgent {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
+        // Initialize agents
+        this.game.createAgents();
 
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
