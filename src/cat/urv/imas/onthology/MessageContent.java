@@ -28,4 +28,8 @@ public class MessageContent {
      */
     public static final String GET_MAP = "Get map";
     
+    public static final String METAL = "Metal";
+    
+    public static final String READY = "Ready";
+    
 }

@@ -21,13 +21,12 @@ import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
+import cat.urv.imas.onthology.MessageContent;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
-import java.util.ArrayList;
-
 
 /**
  * System agent that controls the GUI and loads initial configuration settings.
@@ -35,7 +34,7 @@ import java.util.ArrayList;
  * the Coordinator agent.
  */
 public class SystemAgent extends ImasAgent {
-
+    
     /**
      * GUI with the map, system agent log and statistics.
      */
@@ -50,14 +49,14 @@ public class SystemAgent extends ImasAgent {
      * round.
      */
     private AID coordinatorAgent;
-
+    
     /**
      * Builds the System agent.
      */
     public SystemAgent() {
         super(AgentType.SYSTEM);
     }
-
+    
     /**
      * A message is shown in the log area of the GUI, as well as in the
      * stantard output.
@@ -71,7 +70,7 @@ public class SystemAgent extends ImasAgent {
         }
         super.log(log);
     }
-
+    
     /**
      * An error message is shown in the log area of the GUI, as well as in the
      * error output.
@@ -85,7 +84,7 @@ public class SystemAgent extends ImasAgent {
         }
         super.errorLog(error);
     }
-
+    
     /**
      * Gets the game settings.
      *
@@ -94,7 +93,7 @@ public class SystemAgent extends ImasAgent {
     public GameSettings getGame() {
         return this.game;
     }
-
+    
     /**
      * Adds (if probability matches) new elements onto the map
      * for every simulation step.
@@ -104,23 +103,23 @@ public class SystemAgent extends ImasAgent {
     public void addElementsForThisSimulationStep() {
         this.game.addElementsForThisSimulationStep();
     }
-
+    
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
      */
     @Override
     protected void setup() {
-
+        
         /* ** Very Important Line (VIL) ************************************* */
         this.setEnabledO2ACommunication(true, 1);
-
+        
         // 1. Register the agent to the DF
         ServiceDescription sd1 = new ServiceDescription();
         sd1.setType(AgentType.SYSTEM.toString());
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
-
+        
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.addServices(sd1);
         dfd.setName(getAID());
@@ -131,11 +130,11 @@ public class SystemAgent extends ImasAgent {
             System.err.println(getLocalName() + " failed registration to DF [ko]. Reason: " + e.getMessage());
             doDelete();
         }
-
+        
         // 2. Load game settings.
         this.game = InitialGameSettings.load("game.settings");
         log("Initial configuration settings loaded");
-
+        
         // 3. Load GUI
         try {
             this.gui = new GraphicInterface(game);
@@ -147,25 +146,30 @@ public class SystemAgent extends ImasAgent {
         
         // Initialize agents
         this.game.createAgents();
-
+        
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.COORDINATOR.toString());
         this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
-                       
+        
         // add behaviours
         // we wait for the initialization of the game
         MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-
+        
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
-
+        
         // Setup finished. When the last inform is received, the agent itself will add
         // a behaviour to send/receive actions
+        ACLMessage ready = new ACLMessage(ACLMessage.INFORM);
+        ready.setContent(MessageContent.READY);
+        ready.clearAllReceiver();
+        ready.addReceiver(this.coordinatorAgent);
+        send(ready);
     }
-
+    
     public void updateGUI() {
         this.gui.updateGame();
     }
-
+    
 }

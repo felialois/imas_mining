@@ -40,7 +40,7 @@ public class GenerateGameSettings {
         settings.setMaxNumberFieldsWithNewMetal(3);
         settings.setMaxAmountOfNewMetal(6);
         settings.setDiggersCapacity(6);
-        settings.setManufacturingCenterPrice(new int[]{80, 90, 60, 70});
+        settings.setManufacturingCenterPrice(new int[]{8, 9, 6, 7});
         settings.setManufacturingCenterMetalType(new MetalType[]{
             MetalType.GOLD,
             MetalType.SILVER,

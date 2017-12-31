@@ -17,22 +17,25 @@
  */
 package cat.urv.imas.agent;
 
-import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.behaviour.coordinator.RequesterBehaviour;
+import cat.urv.imas.behaviour.coordinator.RequesterBehaviourCoor;
+import cat.urv.imas.onthology.GameSettings;
+import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.*;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
 
 /**
- * The main Coordinator agent. 
+ * The main Coordinator agent.
  * TODO: This coordinator agent should get the game settings from the System
  * agent every round and share the necessary information to other coordinators.
  */
 public class CoordinatorAgent extends ImasAgent {
-
+    
     /**
      * Game settings in use.
      */
@@ -41,25 +44,25 @@ public class CoordinatorAgent extends ImasAgent {
      * System agent id.
      */
     private AID systemAgent;
-
+    
     /**
      * Builds the coordinator agent.
      */
     public CoordinatorAgent() {
         super(AgentType.COORDINATOR);
     }
-
+    
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
      */
     @Override
     protected void setup() {
-
+        
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
         /* ********************************************************************/
-
+        
         // Register the agent to the DF
         ServiceDescription sd1 = new ServiceDescription();
         sd1.setType(AgentType.COORDINATOR.toString());
@@ -76,14 +79,23 @@ public class CoordinatorAgent extends ImasAgent {
             System.err.println(getLocalName() + " registration with DF unsucceeded. Reason: " + e.getMessage());
             doDelete();
         }
-
+        
         // search SystemAgent
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.SYSTEM.toString());
         this.systemAgent = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
-
+        
+        
         /* ********************************************************************/
+        // Waits for the ready message from the sys
+        ACLMessage ready;
+        do {
+            ready = receive();
+        } while(ready == null ||
+            !MessageContent.READY.equals(ready.getContent()));
+        log("System ready");
+        
         ACLMessage initialRequest = new ACLMessage(ACLMessage.REQUEST);
         initialRequest.clearAllReceiver();
         initialRequest.addReceiver(this.systemAgent);
@@ -95,14 +107,12 @@ public class CoordinatorAgent extends ImasAgent {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //we add a behaviour that sends the message and waits for an answer
-        this.addBehaviour(new RequesterBehaviour(this, initialRequest));
-
+        
         // setup finished. When we receive the last inform, the agent itself will add
         // a behaviour to send/receive actions
+        this.addBehaviour(new RequesterBehaviourCoor(this, initialRequest));
     }
-
+    
     /**
      * Update the game settings.
      *
@@ -111,7 +121,7 @@ public class CoordinatorAgent extends ImasAgent {
     public void setGame(GameSettings game) {
         this.game = game;
     }
-
+    
     /**
      * Gets the current game settings.
      *
@@ -120,5 +130,5 @@ public class CoordinatorAgent extends ImasAgent {
     public GameSettings getGame() {
         return this.game;
     }
-
+    
 }

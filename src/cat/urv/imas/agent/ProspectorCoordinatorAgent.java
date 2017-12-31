@@ -7,14 +7,19 @@ package cat.urv.imas.agent;
 
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.coordinator.RequesterBehaviour;
+import cat.urv.imas.behaviour.coordinator.RequesterBehaviourProsCoor;
+import cat.urv.imas.onthology.GameSettings;
+import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
 
 /**
  *
@@ -22,6 +27,14 @@ import jade.lang.acl.ACLMessage;
  */
 public class ProspectorCoordinatorAgent extends CoordinatorAgent{
     
+    /**
+     * Game settings in use.
+     */
+    private GameSettings game;
+    
+    /**
+     * Coordinator agent id
+     */
     private AID coordinatorAgent;
     
     /**
@@ -52,16 +65,19 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
             doDelete();
         }
 
-        // search SystemAgent
+        // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.COORDINATOR.toString());
         this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
 
         /* ********************************************************************/
+        
         ACLMessage initialRequest = new ACLMessage(ACLMessage.REQUEST);
         initialRequest.clearAllReceiver();
-        initialRequest.addReceiver(this.coordinatorAgent);
+        searchCriterion = new ServiceDescription();
+        searchCriterion.setType(AgentType.SYSTEM.toString());
+        initialRequest.addReceiver(UtilsAgents.searchAgent(this, searchCriterion));
         initialRequest.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
         log("Request message to agent");
         try {
@@ -72,7 +88,7 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         }
 
         //we add a behaviour that sends the message and waits for an answer
-        this.addBehaviour(new RequesterBehaviour(this, initialRequest));
+        this.addBehaviour(new RequesterBehaviourProsCoor(this, initialRequest));
 
         // setup finished. When we receive the last inform, the agent itself will add
         // a behaviour to send/receive actions
