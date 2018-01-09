@@ -247,5 +247,13 @@ public class GameSettings implements java.io.Serializable {
         }
         return max;
     }
+    
+    public int getNumberOfProspectors(){
+        return agentList.get(AgentType.PROSPECTOR).size();
+    }
+    
+        public int getNumberOfDiggers(){
+        return agentList.get(AgentType.DIGGER).size();
+    }
 
 }
