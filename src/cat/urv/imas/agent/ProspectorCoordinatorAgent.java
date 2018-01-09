@@ -8,6 +8,7 @@ package cat.urv.imas.agent;
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.coordinator.RequesterBehaviour;
 import cat.urv.imas.behaviour.coordinator.RequesterBehaviourProsCoor;
+import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.MessageContent;
@@ -20,6 +21,8 @@ import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
+import java.util.List;
+import java.lang.Math;
 
 /**
  *
@@ -37,6 +40,12 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
      */
     private AID coordinatorAgent;
     
+    @Override
+    public void setGame(GameSettings game) {
+        this.game = game;
+        this.divideMap();
+    }
+        
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
@@ -89,9 +98,25 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
 
         //we add a behaviour that sends the message and waits for an answer
         this.addBehaviour(new RequesterBehaviourProsCoor(this, initialRequest));
-
+        
         // setup finished. When we receive the last inform, the agent itself will add
         // a behaviour to send/receive actions
+    }
+    
+    public void divideMap(){        
+        Cell[][] map = game.getMap();
+        int prs = game.getNumberOfProspectors();
+        long[] x_positions = new long[prs];
+        long[] y_positions = new long[prs];
+
+        long x_size = Math.round(map.length/ Math.sqrt(prs));
+        long y_size = Math.round(map[0].length/ Math.sqrt(prs));
+        for(int i=0;i<prs;i++){
+            x_positions[i] = i*x_size;
+            y_positions[i] = i*y_size;
+        }
+        
+        log("Map divided");
     }
     
 }

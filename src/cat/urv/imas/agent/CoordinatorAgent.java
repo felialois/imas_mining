@@ -52,6 +52,8 @@ public class CoordinatorAgent extends ImasAgent {
         super(AgentType.COORDINATOR);
     }
     
+    private AID prospectorCoordinator;
+    
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
@@ -110,7 +112,7 @@ public class CoordinatorAgent extends ImasAgent {
         
         // setup finished. When we receive the last inform, the agent itself will add
         // a behaviour to send/receive actions
-        this.addBehaviour(new RequesterBehaviourCoor(this, initialRequest));
+        this.addBehaviour(new RequesterBehaviourCoor(this, initialRequest));        
     }
     
     /**
@@ -130,5 +132,6 @@ public class CoordinatorAgent extends ImasAgent {
     public GameSettings getGame() {
         return this.game;
     }
+    
     
 }
