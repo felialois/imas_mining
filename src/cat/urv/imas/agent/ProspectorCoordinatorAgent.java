@@ -105,17 +105,36 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
     
     public void divideMap(){        
         Cell[][] map = game.getMap();
+        
+        int size_x = map.length;
+        int size_y = map[0].length;
         int prs = game.getNumberOfProspectors();
-        long[] x_positions = new long[prs];
-        long[] y_positions = new long[prs];
+        long[] x_min_positions = new long[prs];
+        long[] y_min_positions = new long[prs];
+        long[] x_max_positions = new long[prs];
+        long[] y_max_positions = new long[prs];
 
-        long x_size = Math.round(map.length/ Math.sqrt(prs));
-        long y_size = Math.round(map[0].length/ Math.sqrt(prs));
-        for(int i=0;i<prs;i++){
-            x_positions[i] = i*x_size;
-            y_positions[i] = i*y_size;
+        long x_size = Math.round(size_x/ Math.sqrt(prs));
+        long y_size = Math.round(size_y/ Math.sqrt(prs));
+        
+        int i = 0;
+        for(long x=0; x<size_x; x+=x_size){
+            for (long y=0; y<size_y; y+=y_size){
+                x_min_positions[i] = x;
+                y_min_positions[i] = y;
+                x_max_positions[i] = x+x_size;
+                y_max_positions[i] = y+y_size;
+                i++;
+            }
+            
         }
         
+        for(int k=0; k<prs;k++){
+            log("X:"+Long.toString(x_min_positions[k])
+                    +" , "+Long.toString(x_max_positions[k]));
+            log("Y:"+Long.toString(y_min_positions[k])
+                    +" , "+Long.toString(y_max_positions[k]));            
+        }
         log("Map divided");
     }
     
