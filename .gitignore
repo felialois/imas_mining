@@ -24,3 +24,5 @@ hs_err_pid*
 game.settings.runtime
 nbproject/private/private.xml
 nbproject/private/private.xml
+nbproject/private/private.xml
+*.xml

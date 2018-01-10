@@ -129,8 +129,8 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         x_max_positions = new long[prs];
         y_max_positions = new long[prs];
 
-        long x_size = Math.round(size_x/ nAreas);
-        long y_size = Math.round(size_y/ nAreas);
+        long x_size = Math.round(size_x/ Math.sqrt(nAreas));
+        long y_size = Math.round(size_y/ Math.sqrt(nAreas));
         
         int i = 0;
         for(long x=0; x<size_x; x+=x_size){
