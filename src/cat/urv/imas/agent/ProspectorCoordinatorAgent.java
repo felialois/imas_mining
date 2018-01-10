@@ -8,12 +8,15 @@ package cat.urv.imas.agent;
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.coordinator.RequesterBehaviour;
 import cat.urv.imas.behaviour.coordinator.RequesterBehaviourProsCoor;
+import cat.urv.imas.behaviour.coordinator.TickerBehaviourProsCoor;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
+import jade.core.behaviours.CompositeBehaviour;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.ParallelBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -40,9 +43,18 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
      */
     private AID coordinatorAgent;
     
+    private final int nAreas = 4;
+    
+    private long[] x_min_positions;
+    private long[] y_min_positions;
+    private long[] x_max_positions;
+    private long[] y_max_positions;
+    private int actArea;
+    
     @Override
     public void setGame(GameSettings game) {
         this.game = game;
+        actArea = 0;
         this.divideMap();
     }
         
@@ -97,7 +109,10 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         }
 
         //we add a behaviour that sends the message and waits for an answer
-        this.addBehaviour(new RequesterBehaviourProsCoor(this, initialRequest));
+        ParallelBehaviour comp_behaviour = new ParallelBehaviour();
+        comp_behaviour.addSubBehaviour(new RequesterBehaviourProsCoor(this, initialRequest));
+        comp_behaviour.addSubBehaviour(new TickerBehaviourProsCoor(this, AP_MIN));
+        this.addBehaviour(comp_behaviour);
         
         // setup finished. When we receive the last inform, the agent itself will add
         // a behaviour to send/receive actions
@@ -109,13 +124,13 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         int size_x = map.length;
         int size_y = map[0].length;
         int prs = game.getNumberOfProspectors();
-        long[] x_min_positions = new long[prs];
-        long[] y_min_positions = new long[prs];
-        long[] x_max_positions = new long[prs];
-        long[] y_max_positions = new long[prs];
+        x_min_positions = new long[prs];
+        y_min_positions = new long[prs];
+        x_max_positions = new long[prs];
+        y_max_positions = new long[prs];
 
-        long x_size = Math.round(size_x/ Math.sqrt(prs));
-        long y_size = Math.round(size_y/ Math.sqrt(prs));
+        long x_size = Math.round(size_x/ nAreas);
+        long y_size = Math.round(size_y/ nAreas);
         
         int i = 0;
         for(long x=0; x<size_x; x+=x_size){
@@ -138,4 +153,34 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         log("Map divided");
     }
     
+    /**
+     * This method returns the next available area for the prospectors
+     * @return Array with the bounds of the area of the prospector
+     * [minX, maxX, minY, maxY]
+     */
+    public long[] getNextArea() {
+        long[] bounds = new long[4];
+        bounds[0] = x_min_positions[actArea%x_min_positions.length];
+        bounds[1] = x_max_positions[actArea%x_max_positions.length];
+        bounds[2] = y_min_positions[actArea%y_min_positions.length];
+        bounds[3] = y_max_positions[actArea%y_max_positions.length];
+        return bounds;
+    }
+    
+    /**
+     * Gets the game settings.
+     *
+     * @return game settings.
+     */
+    public GameSettings getGame() {
+        return this.game;
+    }
+    
+    /**
+     * Gets the coordinator agent
+     * @return AID of the coordinator agent
+     */
+    public AID getCoordinatorAgent(){
+        return coordinatorAgent;
+    }
 }
