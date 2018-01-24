@@ -111,7 +111,7 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         //we add a behaviour that sends the message and waits for an answer
         ParallelBehaviour comp_behaviour = new ParallelBehaviour();
         comp_behaviour.addSubBehaviour(new RequesterBehaviourProsCoor(this, initialRequest));
-        comp_behaviour.addSubBehaviour(new TickerBehaviourProsCoor(this, AP_MIN));
+        comp_behaviour.addSubBehaviour(new TickerBehaviourProsCoor(this, 1));
         this.addBehaviour(comp_behaviour);
         
         // setup finished. When we receive the last inform, the agent itself will add

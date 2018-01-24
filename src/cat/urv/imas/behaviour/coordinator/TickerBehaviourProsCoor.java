@@ -54,7 +54,7 @@ public class TickerBehaviourProsCoor extends TickerBehaviour{
         } else if(content.startsWith(MessageContent.METAL)) {
             ACLMessage msgMetal = new ACLMessage(ACLMessage.INFORM);
             msgMetal.setContent(content);
-            msgMetal.addReceiver(agent.getCoordinatorAgent());
+//            msgMetal.addReceiver(agent.getCoordinatorAgent());
             agent.send(msgMetal);
         } else{
             agent.errorLog("Error: " + content);
