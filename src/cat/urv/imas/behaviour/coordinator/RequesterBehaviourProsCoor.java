@@ -9,15 +9,8 @@ import cat.urv.imas.agent.AgentType;
 import cat.urv.imas.agent.CoordinatorAgent;
 import cat.urv.imas.agent.UtilsAgents;
 import cat.urv.imas.onthology.MessageContent;
-import jade.core.Agent;
-import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
-import static jade.lang.acl.ACLParserConstants.AID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

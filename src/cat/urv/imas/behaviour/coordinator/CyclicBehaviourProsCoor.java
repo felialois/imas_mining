@@ -8,21 +8,21 @@ package cat.urv.imas.behaviour.coordinator;
 import cat.urv.imas.agent.ProspectorCoordinatorAgent;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.Agent;
-import jade.core.behaviours.TickerBehaviour;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 
 /**
  *
  * @author santi
  */
-public class TickerBehaviourProsCoor extends TickerBehaviour{
+public class CyclicBehaviourProsCoor extends CyclicBehaviour{
 
-    public TickerBehaviourProsCoor(Agent a, long period) {
-        super(a, period);
+    public CyclicBehaviourProsCoor(Agent a) {
+        super(a);
     }
 
     @Override
-    protected void onTick() {
+    public void action() {
         ACLMessage msg = myAgent.receive();
         if(msg == null)
             return;
@@ -54,7 +54,7 @@ public class TickerBehaviourProsCoor extends TickerBehaviour{
         } else if(content.startsWith(MessageContent.METAL)) {
             ACLMessage msgMetal = new ACLMessage(ACLMessage.INFORM);
             msgMetal.setContent(content);
-//            msgMetal.addReceiver(agent.getCoordinatorAgent());
+            //msgMetal.addReceiver(agent.getCoordinatorAgent());
             agent.send(msgMetal);
         } else{
             agent.errorLog("Error: " + content);

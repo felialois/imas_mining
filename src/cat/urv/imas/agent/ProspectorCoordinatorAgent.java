@@ -6,26 +6,20 @@
 package cat.urv.imas.agent;
 
 import static cat.urv.imas.agent.ImasAgent.OWNER;
-import cat.urv.imas.behaviour.coordinator.RequesterBehaviour;
+import cat.urv.imas.behaviour.coordinator.CyclicBehaviourProsCoor;
 import cat.urv.imas.behaviour.coordinator.RequesterBehaviourProsCoor;
-import cat.urv.imas.behaviour.coordinator.TickerBehaviourProsCoor;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.GameSettings;
-import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
-import jade.core.behaviours.CompositeBehaviour;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.ParallelBehaviour;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.UnreadableException;
-import java.util.List;
-import java.lang.Math;
 
 /**
  *
@@ -109,10 +103,10 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         }
 
         //we add a behaviour that sends the message and waits for an answer
-        ParallelBehaviour comp_behaviour = new ParallelBehaviour();
-        comp_behaviour.addSubBehaviour(new RequesterBehaviourProsCoor(this, initialRequest));
-        comp_behaviour.addSubBehaviour(new TickerBehaviourProsCoor(this, 1));
-        this.addBehaviour(comp_behaviour);
+        SequentialBehaviour seq_behaviour = new SequentialBehaviour();
+        seq_behaviour.addSubBehaviour(new RequesterBehaviourProsCoor(this, initialRequest));
+        seq_behaviour.addSubBehaviour(new CyclicBehaviourProsCoor(this));
+        this.addBehaviour(seq_behaviour);
         
         // setup finished. When we receive the last inform, the agent itself will add
         // a behaviour to send/receive actions
@@ -145,6 +139,7 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         }
         
         for(int k=0; k<prs;k++){
+            log("Area " + k);
             log("X:"+Long.toString(x_min_positions[k])
                     +" , "+Long.toString(x_max_positions[k]));
             log("Y:"+Long.toString(y_min_positions[k])
@@ -172,6 +167,7 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
      *
      * @return game settings.
      */
+    @Override
     public GameSettings getGame() {
         return this.game;
     }
