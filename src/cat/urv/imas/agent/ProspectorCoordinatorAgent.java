@@ -1,8 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
 package cat.urv.imas.agent;
 
 import static cat.urv.imas.agent.ImasAgent.OWNER;
@@ -51,18 +51,18 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         actArea = 0;
         this.divideMap();
     }
-        
+    
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
      */
     @Override
     protected void setup() {
-
+        
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
         /* ********************************************************************/
-
+        
         // Register the agent to the DF
         ServiceDescription sd1 = new ServiceDescription();
         sd1.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
@@ -79,13 +79,13 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
             System.err.println(getLocalName() + " registration with DF unsucceeded. Reason: " + e.getMessage());
             doDelete();
         }
-
+        
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.COORDINATOR.toString());
         this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
-
+        
         /* ********************************************************************/
         
         ACLMessage initialRequest = new ACLMessage(ACLMessage.REQUEST);
@@ -101,7 +101,7 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        
         //we add a behaviour that sends the message and waits for an answer
         SequentialBehaviour seq_behaviour = new SequentialBehaviour();
         seq_behaviour.addSubBehaviour(new RequesterBehaviourProsCoor(this, initialRequest));
@@ -112,7 +112,7 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         // a behaviour to send/receive actions
     }
     
-    public void divideMap(){        
+    public void divideMap(){
         Cell[][] map = game.getMap();
         
         int size_x = map.length;
@@ -122,7 +122,7 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         y_min_positions = new long[prs];
         x_max_positions = new long[prs];
         y_max_positions = new long[prs];
-
+        
         long x_size = Math.round(size_x/ Math.sqrt(nAreas));
         long y_size = Math.round(size_y/ Math.sqrt(nAreas));
         
@@ -135,17 +135,23 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
                 y_max_positions[i] = y+y_size;
                 i++;
             }
-            
         }
         
+        ACLMessage areasMessage = new ACLMessage(ACLMessage.INFORM);
+        ServiceDescription searchCriterion = new ServiceDescription();
+        searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
+        areasMessage.addReceiver(UtilsAgents.searchAgent(this, searchCriterion));
+        String message = MessageContent.AREAS + " " + prs;
+        areasMessage.setContent(message);
+        send(areasMessage);
         for(int k=0; k<prs;k++){
             log("Area " + k);
             log("X:"+Long.toString(x_min_positions[k])
                     +" , "+Long.toString(x_max_positions[k]));
             log("Y:"+Long.toString(y_min_positions[k])
-                    +" , "+Long.toString(y_max_positions[k]));            
+                    +" , "+Long.toString(y_max_positions[k]));
         }
-        log("Map divided");
+        log("Map divided and sent to the digger coord");
     }
     
     /**
@@ -160,16 +166,6 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         bounds[2] = y_min_positions[actArea%y_min_positions.length];
         bounds[3] = y_max_positions[actArea%y_max_positions.length];
         return bounds;
-    }
-    
-    /**
-     * Gets the game settings.
-     *
-     * @return game settings.
-     */
-    @Override
-    public GameSettings getGame() {
-        return this.game;
     }
     
     /**

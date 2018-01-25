@@ -34,4 +34,6 @@ public class MessageContent {
     
     public static final String GET_AREA = "Get area";
     
+    public static final String AREAS = "Areas";
+    
 }
