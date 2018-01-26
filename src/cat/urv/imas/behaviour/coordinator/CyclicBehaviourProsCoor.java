@@ -17,6 +17,7 @@ import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,7 +55,10 @@ public class CyclicBehaviourProsCoor extends CyclicBehaviour{
             ACLMessage reply = msg.createReply();
                 reply.setPerformative(ACLMessage.INFORM);
             try{
-                reply.setContentObject(agent.getNextArea());
+                reply.setContent(MessageContent.GET_AREA
+                        +Arrays.toString(agent.getNextArea()));
+                System.out.print(MessageContent.GET_AREA
+                        +Arrays.toString(agent.getNextArea()));
             } catch (Exception e) {
                 reply.setPerformative(ACLMessage.FAILURE);
                 agent.errorLog(e.toString());

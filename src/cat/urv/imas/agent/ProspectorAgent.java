@@ -7,13 +7,17 @@ package cat.urv.imas.agent;
 
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorProspector;
+import cat.urv.imas.behaviour.coordinator.CyclicBehaviourProsCoor;
+import cat.urv.imas.behaviour.coordinator.RequesterBehaviourProsCoor;
 import cat.urv.imas.onthology.MessageContent;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import java.util.List;
 
 /**
  *
@@ -30,11 +34,12 @@ public class ProspectorAgent extends WorkerAgent{
         super(AgentType.PROSPECTOR);
     }
     
-    public void set_location(long[] s){
-        min_x=s[0];
-        max_x=s[1];
-        min_y=s[2];
-        max_y=s[3];
+    public void set_location(String s){
+        String[] ls = s.split("\\[")[1].split("\\]")[0].split(",");
+        min_x=Long.parseLong(ls[0].replace(" ", ""));
+        max_x=Long.parseLong(ls[1].replace(" ", ""));
+        min_y=Long.parseLong(ls[2].replace(" ", ""));
+        max_y=Long.parseLong(ls[3].replace(" ", ""));
         log("Location Received by Prospector");
     }
     
@@ -74,6 +79,7 @@ public class ProspectorAgent extends WorkerAgent{
             !MessageContent.READY.equals(ready.getContent()));
         log("Prospector coor ready");
         
+        // Send message to get the map
         ACLMessage mapRequest = new ACLMessage(ACLMessage.REQUEST);
         mapRequest.clearAllReceiver();
         mapRequest.addReceiver(this.coordinator);
@@ -85,9 +91,29 @@ public class ProspectorAgent extends WorkerAgent{
             log("error in message creation prospector");
             e.printStackTrace();
         }
-        
+       
         RequesterBehaviorProspector rbp = new RequesterBehaviorProspector(this, mapRequest);
-        this.addBehaviour(rbp);
+        
+        // Send message to get the area
+        ACLMessage areaRequest = new ACLMessage(ACLMessage.REQUEST);
+        areaRequest.clearAllReceiver();
+        areaRequest.addReceiver(this.coordinator);
+        areaRequest.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+         try {
+            areaRequest.setContent(MessageContent.GET_AREA);
+            log("Request message content");
+        } catch (Exception e) {
+            log("error in message creation prospector");
+            e.printStackTrace();
+        }
+         
+        RequesterBehaviorProspector getAreaBehavior
+                = new RequesterBehaviorProspector(this, areaRequest);
+        
+        SequentialBehaviour seq_behaviour = new SequentialBehaviour();
+        seq_behaviour.addSubBehaviour(rbp);
+        seq_behaviour.addSubBehaviour(getAreaBehavior);
+        this.addBehaviour(seq_behaviour);
         
         
 

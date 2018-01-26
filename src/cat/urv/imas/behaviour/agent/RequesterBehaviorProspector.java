@@ -14,6 +14,7 @@ import cat.urv.imas.behaviour.coordinator.RequesterBehaviour;
 import cat.urv.imas.onthology.MessageContent;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+import java.util.List;
 
 /**
  *
@@ -29,9 +30,9 @@ public class RequesterBehaviorProspector extends RequesterAgentBehaviour{
     @Override
     protected void handleInform(ACLMessage msg) {
         if(msg.getContent().startsWith(MessageContent.GET_AREA)) {
-            
+
             try{
-                long[] content =(long[]) msg.getContentObject();
+                String content = msg.getContent();
                 ProspectorAgent prs = (ProspectorAgent) myAgent;
                 prs.set_location(content);
             } catch(Exception e){

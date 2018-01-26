@@ -191,8 +191,8 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
      * @return Array with the bounds of the area of the prospector
      * [minX, maxX, minY, maxY]
      */
-    public long[] getNextArea() {
-        long[] bounds = new long[4];
+    public Long[] getNextArea() {
+        Long[] bounds = new Long[4];
         bounds[0] = x_min_positions[actArea%x_min_positions.length];
         bounds[1] = x_max_positions[actArea%x_max_positions.length];
         bounds[2] = y_min_positions[actArea%y_min_positions.length];
