@@ -28,27 +28,6 @@ public class CyclicBehaviourProsCoor extends CyclicBehaviour{
 
     public CyclicBehaviourProsCoor(Agent a) {
         super(a);
-        try {
-            // Send message informing the workers that coordinator is ready
-            ACLMessage ready = new ACLMessage(ACLMessage.INFORM);
-            ready.setContent(MessageContent.READY);
-            ready.clearAllReceiver();
-            
-            DFAgentDescription DFDescription = new DFAgentDescription();
-            ServiceDescription searchCriterion = new ServiceDescription();
-            searchCriterion.setType(AgentType.PROSPECTOR.toString());
-            DFDescription.addServices(searchCriterion);
-            
-            DFAgentDescription[] prospectors = DFService.search(myAgent, DFDescription);
-            
-            for(int i = 0; i < prospectors.length; i++)
-                ready.addReceiver(prospectors[i].getName());
-            
-            myAgent.send(ready);
-            
-        } catch (FIPAException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -69,7 +48,8 @@ public class CyclicBehaviourProsCoor extends CyclicBehaviour{
                 agent.errorLog(e.toString());
                 e.printStackTrace();
             }
-            agent.send(msg);
+            agent.send(reply);
+            agent.log("Map sent to prospector");
         } else if(content.equals(MessageContent.GET_AREA)) {
             ACLMessage reply = msg.createReply();
                 reply.setPerformative(ACLMessage.INFORM);

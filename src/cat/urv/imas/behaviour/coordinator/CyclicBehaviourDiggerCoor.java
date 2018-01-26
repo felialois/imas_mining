@@ -24,26 +24,6 @@ public class CyclicBehaviourDiggerCoor extends CyclicBehaviour{
 
     public CyclicBehaviourDiggerCoor(Agent a) {
         super(a);
-        try {
-            // Send message informing the workers that coordinator is ready
-            ACLMessage ready = new ACLMessage(ACLMessage.INFORM);
-            ready.setContent(MessageContent.READY);
-            ready.clearAllReceiver();
-            
-            DFAgentDescription DFDescription = new DFAgentDescription();
-            ServiceDescription searchCriterion = new ServiceDescription();
-            searchCriterion.setType(AgentType.DIGGER.toString());
-            DFDescription.addServices(searchCriterion);
-            DFAgentDescription[] diggers = DFService.search(myAgent, DFDescription);
-            
-            for(int i = 0; i < diggers.length; i++)
-                ready.addReceiver(diggers[i].getName());
-            
-            myAgent.send(ready);
-            
-        } catch (FIPAException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -64,7 +44,8 @@ public class CyclicBehaviourDiggerCoor extends CyclicBehaviour{
                 agent.errorLog(e.toString());
                 e.printStackTrace();
             }
-            agent.send(msg);
+            agent.send(reply);
+            agent.log("Map sent to digger");
         } else if(content.startsWith(MessageContent.AREAS)) {
             agent.setNumAreas(Integer.parseInt(content.substring(MessageContent.AREAS.length()+1)));
         } else if(content.startsWith(MessageContent.METAL)) {

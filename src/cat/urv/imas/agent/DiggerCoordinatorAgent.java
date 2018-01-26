@@ -40,6 +40,33 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
     private int numDiggers;
     private int numAreas;
     
+    @Override
+    public void setGame(GameSettings game) {
+        this.game = game;
+        
+        try {
+            // Send message informing the workers that coordinator is ready
+            ACLMessage ready = new ACLMessage(ACLMessage.INFORM);
+            ready.setContent(MessageContent.READY);
+            ready.clearAllReceiver();
+            
+            DFAgentDescription DFDescription = new DFAgentDescription();
+            ServiceDescription searchCriterion = new ServiceDescription();
+            searchCriterion.setType(AgentType.DIGGER.toString());
+            DFDescription.addServices(searchCriterion);
+            
+            DFAgentDescription[] prospectors = DFService.search(this, DFDescription);
+            
+            for(int i = 0; i < prospectors.length; i++)
+                ready.addReceiver(prospectors[i].getName());
+            
+            send(ready);
+            
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
+    }
+    
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.

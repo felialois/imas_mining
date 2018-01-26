@@ -50,6 +50,28 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         this.game = game;
         actArea = 0;
         this.divideMap();
+        
+        try {
+            // Send message informing the workers that coordinator is ready
+            ACLMessage ready = new ACLMessage(ACLMessage.INFORM);
+            ready.setContent(MessageContent.READY);
+            ready.clearAllReceiver();
+            
+            DFAgentDescription DFDescription = new DFAgentDescription();
+            ServiceDescription searchCriterion = new ServiceDescription();
+            searchCriterion.setType(AgentType.PROSPECTOR.toString());
+            DFDescription.addServices(searchCriterion);
+            
+            DFAgentDescription[] prospectors = DFService.search(this, DFDescription);
+            
+            for(int i = 0; i < prospectors.length; i++)
+                ready.addReceiver(prospectors[i].getName());
+            
+            send(ready);
+            
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -152,6 +174,16 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
                     +" , "+Long.toString(y_max_positions[k]));
         }
         log("Map divided and sent to the digger coord");
+    }
+    
+    /**
+     * Gets the game settings.
+     *
+     * @return game settings.
+     */
+    @Override
+    public GameSettings getGame() {
+        return this.game;
     }
     
     /**
