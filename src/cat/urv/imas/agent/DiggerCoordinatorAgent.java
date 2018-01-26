@@ -53,7 +53,7 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
 
         // Register the agent to the DF
         ServiceDescription sd1 = new ServiceDescription();
-        sd1.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
+        sd1.setType(AgentType.DIGGER_COORDINATOR.toString());
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
         

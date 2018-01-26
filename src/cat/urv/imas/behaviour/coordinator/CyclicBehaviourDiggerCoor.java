@@ -5,10 +5,15 @@
  */
 package cat.urv.imas.behaviour.coordinator;
 
+import cat.urv.imas.agent.AgentType;
 import cat.urv.imas.agent.DiggerCoordinatorAgent;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 
 /**
@@ -19,6 +24,26 @@ public class CyclicBehaviourDiggerCoor extends CyclicBehaviour{
 
     public CyclicBehaviourDiggerCoor(Agent a) {
         super(a);
+        try {
+            // Send message informing the workers that coordinator is ready
+            ACLMessage ready = new ACLMessage(ACLMessage.INFORM);
+            ready.setContent(MessageContent.READY);
+            ready.clearAllReceiver();
+            
+            DFAgentDescription DFDescription = new DFAgentDescription();
+            ServiceDescription searchCriterion = new ServiceDescription();
+            searchCriterion.setType(AgentType.DIGGER.toString());
+            DFDescription.addServices(searchCriterion);
+            DFAgentDescription[] diggers = DFService.search(myAgent, DFDescription);
+            
+            for(int i = 0; i < diggers.length; i++)
+                ready.addReceiver(diggers[i].getName());
+            
+            myAgent.send(ready);
+            
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

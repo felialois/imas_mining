@@ -66,6 +66,14 @@ public class ProspectorAgent extends WorkerAgent{
         this.coordinator = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
         
+        // Waits for the ready message from the coor
+        ACLMessage ready;
+        do {
+            ready = receive();
+        } while(ready == null ||
+            !MessageContent.READY.equals(ready.getContent()));
+        log("Prospector coor ready");
+        
         ACLMessage mapRequest = new ACLMessage(ACLMessage.REQUEST);
         mapRequest.clearAllReceiver();
         mapRequest.addReceiver(this.coordinator);
@@ -78,7 +86,7 @@ public class ProspectorAgent extends WorkerAgent{
             e.printStackTrace();
         }
         
-        RequesterBehaviorProspector rbp = new RequesterBehaviorProspector(this,mapRequest);
+        RequesterBehaviorProspector rbp = new RequesterBehaviorProspector(this, mapRequest);
         this.addBehaviour(rbp);
         
         

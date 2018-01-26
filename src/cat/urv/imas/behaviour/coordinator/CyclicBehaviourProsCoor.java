@@ -5,11 +5,20 @@
  */
 package cat.urv.imas.behaviour.coordinator;
 
+import cat.urv.imas.agent.AgentType;
 import cat.urv.imas.agent.ProspectorCoordinatorAgent;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.AMSAgentDescription;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -19,6 +28,27 @@ public class CyclicBehaviourProsCoor extends CyclicBehaviour{
 
     public CyclicBehaviourProsCoor(Agent a) {
         super(a);
+        try {
+            // Send message informing the workers that coordinator is ready
+            ACLMessage ready = new ACLMessage(ACLMessage.INFORM);
+            ready.setContent(MessageContent.READY);
+            ready.clearAllReceiver();
+            
+            DFAgentDescription DFDescription = new DFAgentDescription();
+            ServiceDescription searchCriterion = new ServiceDescription();
+            searchCriterion.setType(AgentType.PROSPECTOR.toString());
+            DFDescription.addServices(searchCriterion);
+            
+            DFAgentDescription[] prospectors = DFService.search(myAgent, DFDescription);
+            
+            for(int i = 0; i < prospectors.length; i++)
+                ready.addReceiver(prospectors[i].getName());
+            
+            myAgent.send(ready);
+            
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
