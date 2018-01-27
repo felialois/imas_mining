@@ -45,6 +45,8 @@ public class CyclicBehaviourDiggerCoor extends CyclicBehaviour{
                 e.printStackTrace();
             }
             agent.send(reply);
+            
+            agent.addDigger(msg.getSender());
             agent.log("Map sent to digger");
         } else if(content.startsWith(MessageContent.AREAS)) {
             agent.setNumAreas(Integer.parseInt(content.substring(MessageContent.AREAS.length()+1)));
