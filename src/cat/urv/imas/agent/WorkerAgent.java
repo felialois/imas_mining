@@ -5,6 +5,7 @@
  */
 package cat.urv.imas.agent;
 
+import cat.urv.imas.onthology.GameSettings;
 import jade.core.AID;
 
 /**
@@ -14,6 +15,12 @@ import jade.core.AID;
 public class WorkerAgent extends ImasAgent{
     
     protected AID coordinator;
+    
+    private GameSettings game;
+    
+    public void setGame(GameSettings game) {
+        this.game = game;
+    }
     
     public AID getCoordinator(){
         return coordinator;
