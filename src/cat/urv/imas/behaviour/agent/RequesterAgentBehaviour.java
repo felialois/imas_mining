@@ -45,6 +45,7 @@ public class RequesterAgentBehaviour extends AchieveREInitiator {
         agent.log("INFORM received from " + ((AID) msg.getSender()).getLocalName());
         try {
             GameSettings game = (GameSettings) msg.getContentObject();
+            agent.setGame(game);
             agent.log(game.getShortString());
         } catch (Exception e) {
             agent.errorLog("Incorrect content: " + e.toString());
