@@ -19,8 +19,9 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
-import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -47,6 +48,7 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
     private long[] y_min_positions;
     private long[] x_max_positions;
     private long[] y_max_positions;
+    private List<AID> diggers;
     
     @Override
     public void setGame(GameSettings game) {
@@ -93,6 +95,8 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
     protected void setup() {
         numProspectors = 0;
         numDiggers = 0;
+        
+        diggers = new ArrayList<>();
 
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
@@ -190,5 +194,10 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
      */
     public int getNumProspectors() {
         return numProspectors;
+    }
+    
+    public void addDigger(AID digger){
+        this.diggers.add(digger);
+        log("Digger Added to Coordinator"+digger);
     }
 }

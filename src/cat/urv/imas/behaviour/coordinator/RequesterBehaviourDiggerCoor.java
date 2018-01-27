@@ -7,6 +7,7 @@ package cat.urv.imas.behaviour.coordinator;
 
 import cat.urv.imas.agent.AgentType;
 import cat.urv.imas.agent.CoordinatorAgent;
+import cat.urv.imas.agent.DiggerCoordinatorAgent;
 import cat.urv.imas.onthology.MessageContent;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -41,8 +42,9 @@ public class RequesterBehaviourDiggerCoor extends RequesterBehaviour{
             try {
                 // Find all the diggers and add the message
                 agents = DFService.search(myAgent, df);
-                for(DFAgentDescription a: agents)
+                for(DFAgentDescription a: agents){
                     msg.addReceiver(a.getName());
+                }
             } catch (FIPAException e) {
                 e.printStackTrace();
             }
