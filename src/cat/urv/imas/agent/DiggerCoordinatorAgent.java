@@ -8,6 +8,7 @@ package cat.urv.imas.agent;
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.coordinator.CyclicBehaviourDiggerCoor;
 import cat.urv.imas.behaviour.coordinator.RequesterBehaviourDiggerCoor;
+import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
@@ -18,6 +19,8 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -38,7 +41,12 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
     
     private int numProspectors;
     private int numDiggers;
+    
     private int numAreas;
+    private long[] x_min_positions;
+    private long[] y_min_positions;
+    private long[] x_max_positions;
+    private long[] y_max_positions;
     
     @Override
     public void setGame(GameSettings game) {
@@ -65,6 +73,16 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
         } catch (FIPAException e) {
             e.printStackTrace();
         }
+        // Check how many diggers and prospectors are there in the map
+        Map<AgentType, List<Cell>> agentList = game.getAgentList();
+        for(Map.Entry<AgentType, List<Cell>> entry: agentList.entrySet()) {
+            AgentType type = entry.getKey();
+            if(type.equals(AgentType.DIGGER))
+                numDiggers = entry.getValue().size();
+            else if(type.equals(AgentType.PROSPECTOR))
+                numProspectors = entry.getValue().size();
+        }
+        log("Diggers: " + numDiggers + " Prospectors: " + numProspectors);
     }
     
     /**
@@ -73,6 +91,8 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
      */
     @Override
     protected void setup() {
+        numProspectors = 0;
+        numDiggers = 0;
 
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
@@ -140,8 +160,35 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
      * Sets the number areas divided by the prospector coordinator
      * @param numAreas: number of areas 
      */
-    public void setNumAreas(int numAreas) {
-        this.numAreas = numAreas;
-        log("Number of areas: " + numAreas);
+    public void setAreas(String areas) {
+        String[] difAreas = areas.split(".");
+        numAreas = difAreas.length;
+        x_min_positions = new long[numAreas];
+        x_max_positions = new long[numAreas];
+        y_min_positions = new long[numAreas];
+        y_max_positions = new long[numAreas];
+        for(int i = 0; i < difAreas.length; i++) {
+            String[] values = difAreas[i].split(",");
+            x_min_positions[i] = Integer.parseInt(values[0]);
+            x_max_positions[i] = Integer.parseInt(values[1]);
+            y_min_positions[i] = Integer.parseInt(values[0]);
+            y_max_positions[i] = Integer.parseInt(values[1]);
+        }
+    }
+    
+    /**
+     * Getter of the number of diggers
+     * @return number of diggers
+     */
+    public int getNumDiggers() {
+        return numDiggers;
+    }
+    
+    /**
+     * Getter of the number of prospectors
+     * @return number of prospectors
+     */
+    public int getNumProspectors() {
+        return numProspectors;
     }
 }

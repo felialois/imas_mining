@@ -47,7 +47,7 @@ public class CyclicBehaviourDiggerCoor extends CyclicBehaviour{
             agent.send(reply);
             agent.log("Map sent to digger");
         } else if(content.startsWith(MessageContent.AREAS)) {
-            agent.setNumAreas(Integer.parseInt(content.substring(MessageContent.AREAS.length()+1)));
+            agent.setAreas(content.substring(MessageContent.AREAS.length()+1));
         } else if(content.startsWith(MessageContent.METAL)) {
             // Empezar la subasta
         } else{
