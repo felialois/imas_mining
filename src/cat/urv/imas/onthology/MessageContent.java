@@ -36,4 +36,16 @@ public class MessageContent {
     
     public static final String AREAS = "Areas";
     
+    // Messages for the auction
+    
+    public static final String AUCTION_START = "Auction Start";
+    
+    public static final String AUCTION_BID = "Auction Bid";
+    
+    public static final String AUCTION_WINNER = "Auction Winner";
+    
+    public static final String AUCTION_LOSER = "Auction Loser";
+
+
+    
 }

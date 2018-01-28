@@ -9,8 +9,10 @@ import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.coordinator.CyclicBehaviourDiggerCoor;
 import cat.urv.imas.behaviour.coordinator.RequesterBehaviourDiggerCoor;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.onthology.Auction;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.Offer;
 import jade.core.AID;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
@@ -21,6 +23,7 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -49,6 +52,7 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
     private long[] x_max_positions;
     private long[] y_max_positions;
     private List<AID> diggers;
+    private Map<Auction,List<Offer>> auctions;
     
     @Override
     public void setGame(GameSettings game) {
@@ -97,6 +101,7 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
         numDiggers = 0;
         
         diggers = new ArrayList<>();
+        auctions = new HashMap<>();
 
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
@@ -199,5 +204,24 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
     public void addDigger(AID digger){
         this.diggers.add(digger);
         log("Digger Added to Coordinator"+digger);
+    }
+    
+    public List<AID> getDiggers(){
+        return diggers;
+    }
+    
+    public void logFromExternal(String lg){
+        log(lg);
+    }
+    
+    public void startAuction(Auction a){
+        auctions.put(a, new ArrayList<Offer>());
+    }
+    
+    public void addBid(Auction a, Offer b){
+        List<Offer> prevOffers = auctions.get(a);
+        auctions.remove(a);
+        prevOffers.add(b);
+        auctions.put(a,prevOffers);
     }
 }
