@@ -6,10 +6,11 @@
 package cat.urv.imas.agent;
 
 import static cat.urv.imas.agent.ImasAgent.OWNER;
+import cat.urv.imas.behaviour.agent.CyclicMessagingPros;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorProspector;
-import cat.urv.imas.behaviour.coordinator.CyclicBehaviourProsCoor;
-import cat.urv.imas.behaviour.coordinator.RequesterBehaviourProsCoor;
 import cat.urv.imas.onthology.MessageContent;
+import jade.core.AID;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -17,7 +18,6 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
-import java.util.List;
 
 /**
  *
@@ -29,6 +29,8 @@ public class ProspectorAgent extends WorkerAgent{
     private long min_y;
     private long max_x;
     private long max_y;
+    
+    private AID assigned_digger;
     
     public ProspectorAgent() {
         super(AgentType.PROSPECTOR);
@@ -113,10 +115,16 @@ public class ProspectorAgent extends WorkerAgent{
         SequentialBehaviour seq_behaviour = new SequentialBehaviour();
         seq_behaviour.addSubBehaviour(rbp);
         seq_behaviour.addSubBehaviour(getAreaBehavior);
+        seq_behaviour.addSubBehaviour(new CyclicMessagingPros(this));
         this.addBehaviour(seq_behaviour);
-        
-        
-
+    }
+    
+    public void setAssignedDigger(AID digger) {
+        this.assigned_digger = digger;
+    }
+    
+    public AID getAssignedDigger() {
+        return assigned_digger;
     }
     
 }

@@ -1,8 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
 package cat.urv.imas.agent;
 
 import static cat.urv.imas.agent.ImasAgent.OWNER;
@@ -42,6 +42,7 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
     
     private int numProspectors;
     private int numDiggers;
+    private int actDigger;
     
     private int numAreas;
     private long[] x_min_positions;
@@ -65,10 +66,10 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
             searchCriterion.setType(AgentType.DIGGER.toString());
             DFDescription.addServices(searchCriterion);
             
-            DFAgentDescription[] prospectors = DFService.search(this, DFDescription);
+            DFAgentDescription[] diggers = DFService.search(this, DFDescription);
             
-            for(int i = 0; i < prospectors.length; i++)
-                ready.addReceiver(prospectors[i].getName());
+            for(int i = 0; i < diggers.length; i++)
+                ready.addReceiver(diggers[i].getName());
             
             send(ready);
             
@@ -95,13 +96,14 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
     protected void setup() {
         numProspectors = 0;
         numDiggers = 0;
+        actDigger = 0;
         
         diggers = new ArrayList<>();
-
+        
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
         /* ********************************************************************/
-
+        
         // Register the agent to the DF
         ServiceDescription sd1 = new ServiceDescription();
         sd1.setType(AgentType.DIGGER_COORDINATOR.toString());
@@ -118,13 +120,13 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
             System.err.println(getLocalName() + " registration with DF unsucceeded. Reason: " + e.getMessage());
             doDelete();
         }
-
+        
         // search SystemAgent
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.COORDINATOR.toString());
         this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
-
+        
         /* ********************************************************************/
         
         ACLMessage initialRequest = new ACLMessage(ACLMessage.REQUEST);
@@ -140,7 +142,7 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        
         //we add a behaviour that sends the message and waits for an answer
         SequentialBehaviour seq_behaviour = new SequentialBehaviour();
         seq_behaviour.addSubBehaviour(new RequesterBehaviourDiggerCoor(this, initialRequest));
@@ -162,7 +164,7 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
     
     /**
      * Sets the number areas divided by the prospector coordinator
-     * @param numAreas: number of areas 
+     * @param numAreas: number of areas
      */
     public void setAreas(String areas) {
         String[] difAreas = areas.split(".");
@@ -177,6 +179,26 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
             x_max_positions[i] = Integer.parseInt(values[1]);
             y_min_positions[i] = Integer.parseInt(values[0]);
             y_max_positions[i] = Integer.parseInt(values[1]);
+        }
+    }
+    
+    public boolean getAssignedProspector() {
+        actDigger++;
+        if(actDigger > numProspectors) {
+            return false;
+        } else{
+            ACLMessage prospectorRequest = new ACLMessage(ACLMessage.REQUEST);
+            ServiceDescription searchCriterion = new ServiceDescription();
+            searchCriterion = new ServiceDescription();
+            searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
+            prospectorRequest.addReceiver(UtilsAgents.searchAgent(this, searchCriterion));
+            if(numDiggers >= numProspectors) {
+                prospectorRequest.setContent(MessageContent.GET_PROS);
+            } else{
+                prospectorRequest.setContent(MessageContent.GET_PROS_BY_AREA);
+            }
+            send(prospectorRequest);
+            return true;
         }
     }
     

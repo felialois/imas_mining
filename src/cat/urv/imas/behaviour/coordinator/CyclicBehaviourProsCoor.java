@@ -53,23 +53,68 @@ public class CyclicBehaviourProsCoor extends CyclicBehaviour{
             agent.log("Map sent to prospector");
         } else if(content.equals(MessageContent.GET_AREA)) {
             ACLMessage reply = msg.createReply();
-                reply.setPerformative(ACLMessage.INFORM);
+            reply.setPerformative(ACLMessage.INFORM);
             try{
                 reply.setContent(MessageContent.GET_AREA
-                        +Arrays.toString(agent.getNextArea()));
-                System.out.print(MessageContent.GET_AREA
-                        +Arrays.toString(agent.getNextArea()));
+                        +Arrays.toString(agent.getNextArea(msg.getSender())));
             } catch (Exception e) {
                 reply.setPerformative(ACLMessage.FAILURE);
                 agent.errorLog(e.toString());
                 e.printStackTrace();
             }
             agent.send(reply);
+            agent.log("Assigned area");
+            if(agent.checkAllProsAssigned()) {
+                // Send message informing the diggers that all the prospectors 
+                // were assigned
+                ACLMessage ready = new ACLMessage(ACLMessage.INFORM);
+                ready.setContent(MessageContent.PROS_ASSIGNED);
+                ready.clearAllReceiver();
+                DFAgentDescription DFDescription = new DFAgentDescription();
+                ServiceDescription searchCriterion = new ServiceDescription();
+                searchCriterion.setType(AgentType.DIGGER.toString());
+                DFDescription.addServices(searchCriterion);
+
+                DFAgentDescription[] diggers;
+                try {
+                    diggers = DFService.search(agent, DFDescription);
+
+                    for(int i = 0; i < diggers.length; i++)
+                        ready.addReceiver(diggers[i].getName());
+
+                } catch (FIPAException e) {
+                    e.printStackTrace();
+                }
+
+                agent.send(ready);
+                agent.log("All prospectors assigned");
+            }
         } else if(content.startsWith(MessageContent.METAL)) {
             ACLMessage msgMetal = new ACLMessage(ACLMessage.INFORM);
             msgMetal.setContent(content);
-            //msgMetal.addReceiver(agent.getCoordinatorAgent());
+            msgMetal.addReceiver(agent.getCoordinatorAgent());
             agent.send(msgMetal);
+            agent.log("Metal found");
+        } else if(content.equals(MessageContent.GET_PROS)) {
+            ACLMessage reply = msg.createReply();
+            reply.setPerformative(ACLMessage.INFORM);
+            try{
+                reply.setContentObject(agent.getNextPros());
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            agent.send(reply);
+            agent.log("Sent assigned prospector");
+        } else if(content.equals(MessageContent.GET_PROS_BY_AREA)) {
+            ACLMessage reply = msg.createReply();
+            reply.setPerformative(ACLMessage.INFORM);
+            try{
+                reply.setContentObject(agent.getNextProsByArea());
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            agent.send(reply);
+            agent.log("Sent assigned prospector by area");
         } else{
             agent.errorLog("Error: " + content);
         }

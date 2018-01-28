@@ -6,20 +6,29 @@
 package cat.urv.imas.agent;
 
 import static cat.urv.imas.agent.ImasAgent.OWNER;
+import cat.urv.imas.behaviour.agent.CyclicMessagingDigger;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorDigger;
 import cat.urv.imas.onthology.MessageContent;
+import jade.core.AID;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author felipe
  */
 public class DiggerAgent extends WorkerAgent{
+    
+    private String movement;
+    private AID assigned_pros;
     
     public DiggerAgent() {
         super(AgentType.DIGGER);
@@ -62,19 +71,44 @@ public class DiggerAgent extends WorkerAgent{
         log("Digger coor ready");
         
         ACLMessage mapRequest = new ACLMessage(ACLMessage.REQUEST);
-        mapRequest.clearAllReceiver();
         mapRequest.addReceiver(this.coordinator);
         mapRequest.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
         try {
             mapRequest.setContent(MessageContent.GET_MAP);
             log("Request message content");
         } catch (Exception e) {
-            log("error in message creation prospector");
+            log("error in message creation digger");
             e.printStackTrace();
         }
         
-        RequesterBehaviorDigger rbp = new RequesterBehaviorDigger(this, mapRequest);
-        this.addBehaviour(rbp);
+        // Waits for the message of the Prospector Coordinator
+        ACLMessage ready_pros;
+        do {
+            ready_pros = receive();
+        } while(ready_pros == null ||
+            !MessageContent.PROS_ASSIGNED.equals(ready_pros.getContent()));
+        log("Pros coor ready");
+        
+        SequentialBehaviour seq_behaviour = new SequentialBehaviour();
+        seq_behaviour.addSubBehaviour(new RequesterBehaviorDigger(this, mapRequest));
+        seq_behaviour.addSubBehaviour(new CyclicMessagingDigger(this));
+        this.addBehaviour(seq_behaviour);
+    }
+    
+    public AID getCoordinator() {
+        return coordinator;
+    }
+    
+    public void setMovement(String movement) {
+        this.movement = movement;
+    }
+
+    public void setAssignedProspector(AID prospector) {
+        this.assigned_pros = prospector;
+    }
+    
+    public AID getAssignedProspector() {
+        return assigned_pros;
     }
     
 }

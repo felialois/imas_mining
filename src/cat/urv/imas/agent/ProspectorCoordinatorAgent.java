@@ -12,7 +12,6 @@ import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
-import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -20,6 +19,8 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  *
@@ -37,7 +38,11 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
      */
     private AID coordinatorAgent;
     
+    private int numProspectors;
+    
     private final int nAreas = 4;
+    private ArrayList<LinkedList<AID>> prospectorsInAreas;
+    private int prospectorsWithArea;
     
     private long[] x_min_positions;
     private long[] y_min_positions;
@@ -45,10 +50,13 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
     private long[] y_max_positions;
     private int actArea;
     
+    private int assignedPros;
+    private int assignedArea;
+    
     @Override
     public void setGame(GameSettings game) {
         this.game = game;
-        actArea = 0;
+        
         this.divideMap();
         
         try {
@@ -63,6 +71,7 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
             DFDescription.addServices(searchCriterion);
             
             DFAgentDescription[] prospectors = DFService.search(this, DFDescription);
+            numProspectors = prospectors.length;
             
             for(int i = 0; i < prospectors.length; i++)
                 ready.addReceiver(prospectors[i].getName());
@@ -80,6 +89,15 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
      */
     @Override
     protected void setup() {
+        
+        actArea = 0;
+        assignedPros = 0;
+        assignedArea = 0;
+        prospectorsWithArea = 0;
+        prospectorsInAreas = new ArrayList<LinkedList<AID>>();
+        for(int i=0; i < nAreas; i++) {
+            prospectorsInAreas.add(new LinkedList<AID>());
+        }
         
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
@@ -163,16 +181,20 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
         areasMessage.addReceiver(UtilsAgents.searchAgent(this, searchCriterion));
-        String message = MessageContent.AREAS + " " + prs;
-        areasMessage.setContent(message);
-        send(areasMessage);
+        String message = MessageContent.AREAS + " ";
         for(int k=0; k<prs;k++){
             log("Area " + k);
             log("X:"+Long.toString(x_min_positions[k])
                     +" , "+Long.toString(x_max_positions[k]));
             log("Y:"+Long.toString(y_min_positions[k])
                     +" , "+Long.toString(y_max_positions[k]));
+            message += Long.toString(x_min_positions[k]) + ',' +
+                    Long.toString(x_max_positions[k]) + ',' +
+                    Long.toString(y_min_positions[k]) + ',' +
+                    Long.toString(y_max_positions[k]) + '.';
         }
+        areasMessage.setContent(message);
+        send(areasMessage);
         log("Map divided and sent to the digger coord");
     }
     
@@ -191,12 +213,14 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
      * @return Array with the bounds of the area of the prospector
      * [minX, maxX, minY, maxY]
      */
-    public Long[] getNextArea() {
+    public Long[] getNextArea(AID prospector) {
         Long[] bounds = new Long[4];
         bounds[0] = x_min_positions[actArea%x_min_positions.length];
         bounds[1] = x_max_positions[actArea%x_max_positions.length];
         bounds[2] = y_min_positions[actArea%y_min_positions.length];
         bounds[3] = y_max_positions[actArea%y_max_positions.length];
+        prospectorsInAreas.get(actArea%y_max_positions.length).add(prospector);
+        prospectorsWithArea++;
         return bounds;
     }
     
@@ -206,5 +230,34 @@ public class ProspectorCoordinatorAgent extends CoordinatorAgent{
      */
     public AID getCoordinatorAgent(){
         return coordinatorAgent;
+    }
+    
+    public AID getNextPros() {
+        try{
+            DFAgentDescription DFDescription = new DFAgentDescription();
+            ServiceDescription searchCriterion = new ServiceDescription();
+            searchCriterion.setType(AgentType.PROSPECTOR.toString());
+            DFDescription.addServices(searchCriterion);
+
+            DFAgentDescription[] prospectors = DFService.search(this, DFDescription);
+            AID prospector = prospectors[assignedPros].getName();
+            assignedPros++;
+            return prospector;
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public AID getNextProsByArea() {
+        LinkedList<AID> actArea = prospectorsInAreas.get(assignedArea);
+        AID prospector = actArea.remove();
+        actArea.addLast(prospector);
+        prospectorsWithArea++;
+        return prospector;
+    }
+    
+    public boolean checkAllProsAssigned() {
+        return numProspectors == prospectorsWithArea;
     }
 }

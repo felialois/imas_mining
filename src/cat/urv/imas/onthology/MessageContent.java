@@ -36,4 +36,14 @@ public class MessageContent {
     
     public static final String AREAS = "Areas";
     
+    public static final String GET_MOVEMENT = "Get movement";
+    
+    public static final String RANDOM = "Random";
+    
+    public static final String GET_PROS = "Get prospector";
+    
+    public static final String GET_PROS_BY_AREA = "Get prospector by area";
+    
+    public static final String PROS_ASSIGNED = "Prospectors assigned";
+    
 }
