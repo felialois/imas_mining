@@ -70,6 +70,14 @@ public abstract class Cell implements java.io.Serializable {
     public int getCol() {
         return this.col;
     }
+    
+    public void setRow(int row) {
+        this.row=row;
+    }
+
+    public void setCol(int col) {
+        this.col=col;
+    }
 
     /**
      * Gets the current cell type.

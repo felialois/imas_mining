@@ -21,6 +21,7 @@ import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
+import cat.urv.imas.behaviour.system.CyclicSystemBehaviour;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.*;
 import jade.domain.*;
@@ -166,6 +167,8 @@ public class SystemAgent extends ImasAgent {
         ready.clearAllReceiver();
         ready.addReceiver(this.coordinatorAgent);
         send(ready);
+        
+        //this.addBehaviour(new CyclicSystemBehaviour(this));
     }
     
     public void updateGUI() {
