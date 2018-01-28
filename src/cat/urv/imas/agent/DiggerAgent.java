@@ -7,7 +7,9 @@ package cat.urv.imas.agent;
 
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorDigger;
+import cat.urv.imas.behaviour.agent.CyclicBehaviourDigger;
 import cat.urv.imas.onthology.MessageContent;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -73,8 +75,15 @@ public class DiggerAgent extends WorkerAgent{
             e.printStackTrace();
         }
         
-        RequesterBehaviorDigger rbp = new RequesterBehaviorDigger(this, mapRequest);
-        this.addBehaviour(rbp);
+        RequesterBehaviorDigger rbd = new RequesterBehaviorDigger(this, mapRequest);
+        this.addBehaviour(rbd);
+        
+        CyclicBehaviourDigger cbd = new CyclicBehaviourDigger(this);
+        
+        SequentialBehaviour seq_behaviour = new SequentialBehaviour();
+        seq_behaviour.addSubBehaviour(rbd);
+        seq_behaviour.addSubBehaviour(cbd);
+        this.addBehaviour(seq_behaviour);
     }
     
 }

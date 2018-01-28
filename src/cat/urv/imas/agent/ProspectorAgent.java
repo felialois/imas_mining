@@ -8,6 +8,7 @@ package cat.urv.imas.agent;
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorProspector;
 import cat.urv.imas.behaviour.coordinator.CyclicBehaviourProsCoor;
+import cat.urv.imas.behaviour.agent.CyclicBehaviourProspector;
 import cat.urv.imas.behaviour.coordinator.RequesterBehaviourProsCoor;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.behaviours.SequentialBehaviour;
@@ -110,10 +111,14 @@ public class ProspectorAgent extends WorkerAgent{
         RequesterBehaviorProspector getAreaBehavior
                 = new RequesterBehaviorProspector(this, areaRequest);
         
+        CyclicBehaviourProspector cbp = new CyclicBehaviourProspector(this);
+        
         SequentialBehaviour seq_behaviour = new SequentialBehaviour();
         seq_behaviour.addSubBehaviour(rbp);
         seq_behaviour.addSubBehaviour(getAreaBehavior);
+        seq_behaviour.addSubBehaviour(cbp);
         this.addBehaviour(seq_behaviour);
+        
         
         
 

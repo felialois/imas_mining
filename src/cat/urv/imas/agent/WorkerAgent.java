@@ -8,6 +8,7 @@ package cat.urv.imas.agent;
 import cat.urv.imas.onthology.GameSettings;
 import jade.core.AID;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  *
@@ -23,6 +24,10 @@ public class WorkerAgent extends ImasAgent{
         this.game = game;
     }
     
+    public GameSettings getGame() {
+        return game;
+    }
+    
     public AID getCoordinator(){
         return coordinator;
     }
@@ -34,15 +39,58 @@ public class WorkerAgent extends ImasAgent{
     
     public WorkerAgent(AgentType type) {
         super(type);
-        this.column = this.game.getAgentList().get(this.type).get(Integer.valueOf(this.getName().substring(3))).getCol();
-        this.row = this.game.getAgentList().get(this.type).get(Integer.valueOf(this.getName().substring(3))).getRow();
+        this.row=0;
+        this.column=0;
+        //System.out.println(this.game.getDiggersCapacity());
+        //this.column = this.game.getAgentList().get(this.type).get(Integer.valueOf(this.getName().substring(3))).getCol();
+        //this.row = this.game.getAgentList().get(this.type).get(Integer.valueOf(this.getName().substring(3))).getRow();
     }
     
-    public void moveRight(){
+    public int getColumn()
+    {
+        return this.column;
+    }
+    
+    public int getRow()
+    {
+        return this.row;
+    }
+    
+    public void setColumn(int column)
+    {
+        this.column=column;
+    }
+    
+    public void setRow(int row)
+    {
+        this.row=row;
+    }
+    
+    public int[] randomMovement(){
+        int randomNumRow = ThreadLocalRandom.current().nextInt(-1, 2);
+        int randomNumCol = ThreadLocalRandom.current().nextInt(-1, 2);
+        int newRow=this.row+randomNumRow;
+        int newCol=this.column+randomNumCol;
+        int result[] = new int[2];
+        
+        if(this.game.getMap()[newRow][newCol].getCellType().toString().equals("PATH"))
+        {
+            result[0]=newRow;
+            result[1]=newCol;
+            return result;
+            //this.game.getAgentList().get(this.getType()).get(Integer.valueOf(this.getName().substring(3,4))).setRow(this.row);
+            //this.game.getAgentList().get(this.getType()).get(Integer.valueOf(this.getName().substring(3,4))).setCol(this.column);
+        }
+        
+        return null;
+    }
+    
+    
+    /*public void moveRight(){
         // TODO: Check if movement is valid (Path cell, Not occupied...)
         this.column ++;
         // TODO: Update map
-    }
+    }*/
     
     /*public void moveLeft(){
         this.column --;
