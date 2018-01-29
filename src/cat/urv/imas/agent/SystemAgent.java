@@ -17,17 +17,24 @@
  */
 package cat.urv.imas.agent;
 
+import cat.urv.imas.behaviour.system.CyclicSystemBehaviour;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
-import cat.urv.imas.behaviour.system.CyclicSystemBehaviour;
+import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.PathCell;
+import cat.urv.imas.onthology.InfoAgent;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * System agent that controls the GUI and loads initial configuration settings.
@@ -50,6 +57,9 @@ public class SystemAgent extends ImasAgent {
      * round.
      */
     private AID coordinatorAgent;
+    
+    private int numDiggers;
+    private int numProspectors;
     
     /**
      * Builds the System agent.
@@ -148,6 +158,9 @@ public class SystemAgent extends ImasAgent {
         // Initialize agents
         this.game.createAgents();
         
+        numDiggers = game.getNumberOfDiggers();
+        numProspectors = game.getNumberOfProspectors();
+        
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.COORDINATOR.toString());
@@ -168,11 +181,71 @@ public class SystemAgent extends ImasAgent {
         ready.addReceiver(this.coordinatorAgent);
         send(ready);
         
-        //this.addBehaviour(new CyclicSystemBehaviour(this));
+        this.addBehaviour(new CyclicSystemBehaviour(this));
     }
     
     public void updateGUI() {
         this.gui.updateGame();
     }
     
+    public void actualize(int[][] prevDiggerPos, int[][] nextDiggerPos, 
+            int[][] prevProsPos, int[][] nextProsPos) {
+        Cell[][] map = game.getMap();
+        Map<AgentType, List<Cell>> agentList = game.getAgentList();
+            
+        for(int i = 0; i < prevDiggerPos.length; i++) {
+            PathCell prevCell = (PathCell) map[prevDiggerPos[i][0]][prevDiggerPos[i][1]];
+            PathCell nextCell = (PathCell) map[nextDiggerPos[i][0]][nextDiggerPos[i][1]];
+            List<InfoAgent> list = prevCell.getAgents().get(AgentType.DIGGER);
+            InfoAgent agent = null;
+            int j = 0;
+            while(agent == null) {
+                String name = list.get(j).getAID().getName();
+                if(name.substring(3, name.indexOf("@")).equals(""+i)) {
+                    agent = list.get(j);
+                }
+                j++;
+            }
+            try{
+                prevCell.removeAgent(agent);
+                nextCell.addAgent(agent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            agentList.get(AgentType.DIGGER).set(i, nextCell);
+        }
+        
+        for(int i = 0; i < prevProsPos.length; i++) {
+            PathCell prevCell = (PathCell) map[prevProsPos[i][0]][prevProsPos[i][1]];
+            PathCell nextCell = (PathCell) map[nextProsPos[i][0]][nextProsPos[i][1]];
+            List<InfoAgent> list = prevCell.getAgents().get(AgentType.PROSPECTOR);
+            InfoAgent agent = null;
+            int j = 0;
+            while(agent == null) {
+                String name = list.get(j).getAID().getName();
+                if(name.substring(3, name.indexOf("@")).equals(""+i)) {
+                    agent = list.get(j);
+                }
+                j++;
+            }
+            try{
+                prevCell.removeAgent(agent);
+                nextCell.addAgent(agent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            agentList.get(AgentType.PROSPECTOR).set(i, nextCell);
+        }
+        game.setAgentList(agentList);
+    }
+    
+    public int getNumDiggers() {
+        return numDiggers;
+    }
+    
+    public int getNumProspectors() {
+        return numProspectors;
+    }
 }

@@ -77,14 +77,8 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
             e.printStackTrace();
         }
         // Check how many diggers and prospectors are there in the map
-        Map<AgentType, List<Cell>> agentList = game.getAgentList();
-        for(Map.Entry<AgentType, List<Cell>> entry: agentList.entrySet()) {
-            AgentType type = entry.getKey();
-            if(type.equals(AgentType.DIGGER))
-                numDiggers = entry.getValue().size();
-            else if(type.equals(AgentType.PROSPECTOR))
-                numProspectors = entry.getValue().size();
-        }
+        numDiggers = game.getNumberOfDiggers();
+        numProspectors = game.getNumberOfProspectors();
         log("Diggers: " + numDiggers + " Prospectors: " + numProspectors);
     }
     
