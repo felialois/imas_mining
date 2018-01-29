@@ -9,6 +9,9 @@ import cat.urv.imas.onthology.MessageContent;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
+import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.PathCell;
+import cat.urv.imas.onthology.InfoAgent;
 
 
 /**
@@ -30,11 +33,41 @@ public class CyclicBehaviourDigger extends CyclicBehaviour{
         
         if(result != null)
         {
-            agent.log(result[0]+","+result[1]);
-            agent.setRow(result[0]);
-            agent.setColumn(result[1]);
-            agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,4))).setRow(result[0]);
-            agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,4))).setCol(result[1]);
+            //agent.log(result[0]+","+result[1]);
+            
+            //PathCell pc_old = (PathCell) agent.getGame().getMap()[agent.getRow()][agent.getColumn()];
+            
+            //try{
+            //    System.out.println(pc_old.getAgents().getFirst().getAID());
+
+           // }catch(Exception e)
+            //{
+                
+            //}
+
+            //agent.setRow(result[0]);
+            //agent.setColumn(result[1]);
+            
+            //PathCell pc_new = (PathCell) agent.getGame().getMap()[agent.getRow()][agent.getColumn()];
+                        
+            //try
+            //{
+            //   InfoAgent ia = pc_old.getAgents().getFirst();
+                
+            //    if(!pc_old.isEmpty())
+            //    {
+            //        pc_old.removeAgent(ia);
+            //    }
+                
+            //    pc_new.addAgent(ia);
+            //}catch(Exception e)
+            //{
+            //    e.printStackTrace();
+            //}
+            
+            
+            //agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,4))).setRow(result[0]);
+            //agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,4))).setCol(result[1]);
         }
    
     }

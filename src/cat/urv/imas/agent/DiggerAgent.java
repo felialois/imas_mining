@@ -7,6 +7,7 @@ package cat.urv.imas.agent;
 
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.agent.CyclicMessagingDigger;
+import cat.urv.imas.behaviour.agent.CyclicBehaviourDigger;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorDigger;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
@@ -91,7 +92,8 @@ public class DiggerAgent extends WorkerAgent{
         
         SequentialBehaviour seq_behaviour = new SequentialBehaviour();
         seq_behaviour.addSubBehaviour(new RequesterBehaviorDigger(this, mapRequest));
-        seq_behaviour.addSubBehaviour(new CyclicMessagingDigger(this));
+        //seq_behaviour.addSubBehaviour(new CyclicMessagingDigger(this));
+        seq_behaviour.addSubBehaviour(new CyclicBehaviourDigger(this));
         this.addBehaviour(seq_behaviour);
     }
     
@@ -102,6 +104,11 @@ public class DiggerAgent extends WorkerAgent{
     public void setMovement(String movement) {
         this.movement = movement;
     }
+    
+    public String getMovement() {
+        return movement;
+    }
+
 
     public void setAssignedProspector(AID prospector) {
         this.assigned_pros = prospector;

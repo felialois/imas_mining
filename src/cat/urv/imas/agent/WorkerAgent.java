@@ -9,6 +9,10 @@ import cat.urv.imas.onthology.GameSettings;
 import jade.core.AID;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.PathCell;
+import cat.urv.imas.onthology.InfoAgent;
+
 
 /**
  *
@@ -75,11 +79,16 @@ public class WorkerAgent extends ImasAgent{
         
         if(this.game.getMap()[newRow][newCol].getCellType().toString().equals("PATH"))
         {
+            this.log("ROW "+this.getRow()+" COLUMN "+this.getColumn());
+            this.log(this.getGame().getMap()[0][7].toString());
+            
             result[0]=newRow;
             result[1]=newCol;
+            
+            this.setRow(newRow);
+            this.setColumn(newCol);            
+            
             return result;
-            //this.game.getAgentList().get(this.getType()).get(Integer.valueOf(this.getName().substring(3,4))).setRow(this.row);
-            //this.game.getAgentList().get(this.getType()).get(Integer.valueOf(this.getName().substring(3,4))).setCol(this.column);
         }
         
         return null;
