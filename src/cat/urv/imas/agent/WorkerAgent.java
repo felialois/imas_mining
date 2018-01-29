@@ -70,45 +70,4 @@ public class WorkerAgent extends ImasAgent{
         this.row=row;
     }
     
-    public int[] randomMovement(){
-        int randomNumRow = ThreadLocalRandom.current().nextInt(-1, 2);
-        int randomNumCol = ThreadLocalRandom.current().nextInt(-1, 2);
-        int newRow=this.row+randomNumRow;
-        int newCol=this.column+randomNumCol;
-        int result[] = new int[2];
-        
-        if(this.game.getMap()[newRow][newCol].getCellType().toString().equals("PATH"))
-        {
-            this.log("ROW "+this.getRow()+" COLUMN "+this.getColumn());
-            this.log(this.getGame().getMap()[0][7].toString());
-            
-            result[0]=newRow;
-            result[1]=newCol;
-            
-            this.setRow(newRow);
-            this.setColumn(newCol);            
-            
-            return result;
-        }
-        
-        return null;
-    }
-    
-    
-    /*public void moveRight(){
-        // TODO: Check if movement is valid (Path cell, Not occupied...)
-        this.column ++;
-        // TODO: Update map
-    }*/
-    
-    /*public void moveLeft(){
-        this.column --;
-    }
-    public void moveUp(){
-        this.row --;
-    }
-    public void moveDown(){
-        this.row ++;
-    }*/
-    
 }

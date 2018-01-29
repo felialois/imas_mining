@@ -71,6 +71,20 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
             e.printStackTrace();
         }
         
+        if(agent.getMovement().equals(MessageContent.RANDOM))
+        {
+            int result[] = new int[2];
+            result=agent.randomMovementDigger();
+            
+            if(result!=null)
+            {
+                agent.setRow(result[0]);
+                agent.setColumn(result[1]);
+            }
+
+            
+        }
+        
     }
     
 }

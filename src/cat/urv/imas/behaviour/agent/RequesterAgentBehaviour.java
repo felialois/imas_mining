@@ -47,8 +47,8 @@ public class RequesterAgentBehaviour extends AchieveREInitiator {
             GameSettings game = (GameSettings) msg.getContentObject();
             agent.setGame(game);
             agent.log(game.getShortString());
-            agent.setRow(agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,4))).getRow());
-            agent.setColumn(agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,4))).getCol());
+            agent.setRow(agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,agent.getName().indexOf("@")))).getRow());
+            agent.setColumn(agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,agent.getName().indexOf("@")))).getCol());
             agent.log(agent.getRow()+","+agent.getColumn());
         } catch (Exception e) {
             agent.errorLog("Incorrect content: " + e.toString());

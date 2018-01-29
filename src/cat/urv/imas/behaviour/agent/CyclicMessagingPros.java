@@ -52,6 +52,16 @@ public class CyclicMessagingPros extends CyclicBehaviour{
         } catch (UnreadableException ex) {
             Logger.getLogger(CyclicMessagingPros.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        int result[] = new int[2];
+        result=agent.randomMovementProspector();
+            
+        if(result!=null)
+        {
+            agent.setRow(result[0]);
+            agent.setColumn(result[1]);
+        }
+
     }
     
 }

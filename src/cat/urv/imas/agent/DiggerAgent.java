@@ -7,7 +7,6 @@ package cat.urv.imas.agent;
 
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.agent.CyclicMessagingDigger;
-import cat.urv.imas.behaviour.agent.CyclicBehaviourDigger;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorDigger;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
@@ -19,6 +18,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,8 +92,7 @@ public class DiggerAgent extends WorkerAgent{
         
         SequentialBehaviour seq_behaviour = new SequentialBehaviour();
         seq_behaviour.addSubBehaviour(new RequesterBehaviorDigger(this, mapRequest));
-        //seq_behaviour.addSubBehaviour(new CyclicMessagingDigger(this));
-        seq_behaviour.addSubBehaviour(new CyclicBehaviourDigger(this));
+        seq_behaviour.addSubBehaviour(new CyclicMessagingDigger(this));
         this.addBehaviour(seq_behaviour);
     }
     
@@ -117,5 +116,26 @@ public class DiggerAgent extends WorkerAgent{
     public AID getAssignedProspector() {
         return assigned_pros;
     }
+    
+    public int[] randomMovementDigger(){
+        int randomNumRow = ThreadLocalRandom.current().nextInt(-1, 2);
+        int randomNumCol = ThreadLocalRandom.current().nextInt(-1, 2);
+        int newRow=this.getRow()+randomNumRow;
+        int newCol=this.getColumn()+randomNumCol;
+        int result[] = new int[2];
+        
+        if(this.getGame().getMap()[newRow][newCol].getCellType().toString().equals("PATH"))
+        {
+            this.log("ROW "+this.getRow()+" COLUMN "+this.getColumn());
+                                                
+            result[0] = newRow;
+            result[1] = newCol;
+            
+            return result;
+        }
+        
+        return null;
+    }    
+
     
 }
