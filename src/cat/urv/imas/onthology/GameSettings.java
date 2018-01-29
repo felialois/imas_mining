@@ -20,6 +20,8 @@ package cat.urv.imas.onthology;
 import cat.urv.imas.agent.AgentType;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.CellType;
+import cat.urv.imas.map.FieldCell;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
@@ -190,11 +192,55 @@ public class GameSettings implements java.io.Serializable {
     }
 
     public Cell[] detectFieldsWithMetal(int row, int col) {
-        //TODO: find all surrounding cells to (row,col) that are
-        //      buildings and have garbage on it.
-        //      Use: FieldCell.detectMetal() to do so.
+        List<Cell> cells = new ArrayList<>();
+        int[] adjacentCellsX = new int[4];
+        int[] adjacentCellsY = new int[4];
+        if(col>0){ 
+            adjacentCellsY[2] = row;
+            adjacentCellsX[2] =col-1;
+        } else{
+            adjacentCellsY[2] = row;
+            adjacentCellsX[2] = 0;
+        }
+        if(col<map.length){
+            adjacentCellsY[3] = row;
+            adjacentCellsX[3] = col+1;
+        }
+        else{
+            adjacentCellsY[3] = row;
+            adjacentCellsX[3] = col;
+        }
+        if (row>0){
+            adjacentCellsY[0] = row-1;
+            adjacentCellsX[0] = col;
+        }else{
+            adjacentCellsY[0] = 0;
+            adjacentCellsX[0] = col;
+        }
+        if (row<map[0].length){
+            adjacentCellsY[1] = row+1;
+            adjacentCellsX[1] = col;
+        }else{
+            adjacentCellsY[1] = 0;
+            adjacentCellsX[1] = col;
+        }
         
-        return null;
+        for(int i=0;i<adjacentCellsX.length;i++){
+            Cell cell = map[adjacentCellsX[i]][adjacentCellsY[i]];
+            if (cell instanceof FieldCell){
+                FieldCell fc = (FieldCell)cell;
+                boolean isMetalEmpty = fc.detectMetal().isEmpty();
+                if (!isMetalEmpty){
+                    cells.add(cell);
+                }
+            }
+            
+        }
+        Cell[] result = new Cell[cells.size()];
+        for(int i=0;i<cells.size();i++){
+            result[i]=cells.get(i);
+        }
+        return result;
     }
 
     /**
@@ -217,8 +263,7 @@ public class GameSettings implements java.io.Serializable {
     }
 
     public String toString() {
-        //TODO: show a human readable summary of the game settings.
-        return "Game settings";
+        return map.toString();
     }
 
     public String getShortString() {
