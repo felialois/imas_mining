@@ -80,7 +80,7 @@ public class WorkerAgent extends ImasAgent{
         if(this.game.getMap()[newRow][newCol].getCellType().toString().equals("PATH"))
         {
             this.log("ROW "+this.getRow()+" COLUMN "+this.getColumn());
-            this.log(this.getGame().getMap()[0][7].toString());
+            this.log(this.getGame().getMap()[1][7].toString());
             
             result[0]=newRow;
             result[1]=newCol;

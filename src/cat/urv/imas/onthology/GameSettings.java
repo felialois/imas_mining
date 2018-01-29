@@ -193,6 +193,7 @@ public class GameSettings implements java.io.Serializable {
         //TODO: find all surrounding cells to (row,col) that are
         //      buildings and have garbage on it.
         //      Use: FieldCell.detectMetal() to do so.
+        
         return null;
     }
 
