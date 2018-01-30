@@ -36,30 +36,33 @@ public class ContractNetResponderBehaviour extends ContractNetResponder {
                 .replace(MessageContent.CONTRACT_PROPOSE, "")
                 .split(",");
         
+        DiggerAgent agent = (DiggerAgent)myAgent;
+        
         
         int proposal = ((DiggerAgent)myAgent).evaluateAction(
                 Integer.parseInt(coord[0]),Integer.parseInt(coord[1]));
-//        if (proposal > 2) {
+        if (agent.actState.equals(DiggerAgent.DiggerState.MOVING)||
+                agent.actState.equals(DiggerAgent.DiggerState.RETRIEVING_METAL)){
             // We provide a proposal
-        System.out.println("Agent " + myAgent.getName() + ": Proposing " + proposal);
-        ACLMessage propose = cfp.createReply();
-        propose.setPerformative(ACLMessage.PROPOSE);
-        propose.setContent(MessageContent.CONTRACT_BID+
-                Integer.parseInt(coord[0])+","+Integer.parseInt(coord[1])
-                +","+String.valueOf(proposal));
-        return propose;
-//        } else {
-//            // We refuse to provide a proposal
-//            System.out.println("Agent " + myAgent.getName() + ": Refuse");
-//            throw new RefuseException("evaluation-failed");
-//        }
+                System.out.println("Agent " + myAgent.getName() + ": Proposing " + proposal);
+                ACLMessage propose = cfp.createReply();
+                propose.setPerformative(ACLMessage.PROPOSE);
+                propose.setContent(MessageContent.CONTRACT_BID+
+                        Integer.parseInt(coord[0])+","+Integer.parseInt(coord[1])
+                        +","+String.valueOf(proposal));
+                return propose;
+        } else {
+            // We refuse to provide a proposal
+            System.out.println("Agent " + myAgent.getName() + ": Refuse");
+            throw new RefuseException("evaluation-failed");
+        }
     }
 
     @Override
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
         System.out.println("Agent " + myAgent.getName()
                 + ": Proposal accepted");
-        if (((DiggerAgent)myAgent).actState==DiggerAgent.DiggerState.GOING_TO_DIG){
+        if (((DiggerAgent)myAgent).actState.equals(DiggerAgent.DiggerState.GOING_TO_DIG)){
             System.out.println("Agent " + myAgent.getName() + 
                     ": Action successfully performed");
             ACLMessage inform = accept.createReply();

@@ -61,6 +61,8 @@ public class DiggerAgent extends WorkerAgent {
         this.setEnabledO2ACommunication(true, 1);
         /* ********************************************************************/
 
+        this.actState = DiggerState.MOVING;
+        
         // Register the agent to the DF
         ServiceDescription sd1 = new ServiceDescription();
         sd1.setType(AgentType.DIGGER.toString());
