@@ -27,7 +27,7 @@ public class AStar {
     {
         ArrayList<Node> open = new ArrayList<Node>();
         ArrayList<Node> closed = new ArrayList<Node>();
-        ArrayList<Cell> succesors = new ArrayList<Node>();
+        ArrayList<Cell> succesors = new ArrayList<>();
         Cell startingCell = map[startingPoint.getX()][startingPoint.getY()];
         
         startingPoint.setF((float) 0);
