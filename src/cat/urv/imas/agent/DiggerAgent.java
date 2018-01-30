@@ -162,7 +162,10 @@ public class DiggerAgent extends WorkerAgent {
     }
 
     public int evaluateAction(int x, int y) {
-        return Math.abs(x-this.getRow()) + Math.abs(y-this.getColumn());
+        int totalMetal = 0;
+        for(int val: metalCarried.values())
+            totalMetal += val;
+        return (maxCapacity-totalMetal) / Math.abs(x-this.getRow()) + Math.abs(y-this.getColumn());
     }
     
     @Override
@@ -191,11 +194,10 @@ public class DiggerAgent extends WorkerAgent {
     }
     
     public boolean hasSpaceAvailable() {
-        int total = 0;
-        for(int val: metalCarried.values()) {
-            total += val;
-        }
-        return total < maxCapacity;
+        int totalMetal = 0;
+        for(int val: metalCarried.values())
+            totalMetal += val;
+        return totalMetal < maxCapacity;
     }
     
     public void setState(DiggerState state) {
