@@ -57,12 +57,14 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
         if(content.startsWith(MessageContent.CONTRACT_ASIGN)) {
             String[] location = content.replace(MessageContent.CONTRACT_ASIGN, "").split(",");
             agent.log("Bid Won Location "+location[0]+" ,"+location[1]);
-            
+            agent.actState = DiggerAgent.DiggerState.GOING_TO_DIG;
+            agent.restartContractNetBehaviour();
         } else if(msg.getContent().equals(MessageContent.RANDOM)) {
             agent.setMovement(MessageContent.RANDOM);
             agent.log("Set movement random");
         } else if(msg.getContent().contains(MessageContent.CONTRACT_REJECT)) {
             agent.log("Bid Lost");
+            agent.restartContractNetBehaviour();
         }else try {
             if(msg.getContentObject() instanceof AID) {
                 agent.setMovement("Follow prospector");
@@ -71,7 +73,8 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
             } else{
                 agent.errorLog("Error: " + content);
             }
-        } catch (UnreadableException e) {
+        } catch (Exception e) {
+            System.out.print("ERROR :"+msg.getContent());
             e.printStackTrace();
         }
         

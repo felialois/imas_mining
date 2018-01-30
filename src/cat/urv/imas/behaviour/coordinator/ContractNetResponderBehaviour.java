@@ -59,7 +59,7 @@ public class ContractNetResponderBehaviour extends ContractNetResponder {
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
         System.out.println("Agent " + myAgent.getName()
                 + ": Proposal accepted");
-        if (((DiggerAgent)myAgent).performAction()) {
+        if (((DiggerAgent)myAgent).actState==DiggerAgent.DiggerState.GOING_TO_DIG){
             System.out.println("Agent " + myAgent.getName() + 
                     ": Action successfully performed");
             ACLMessage inform = accept.createReply();

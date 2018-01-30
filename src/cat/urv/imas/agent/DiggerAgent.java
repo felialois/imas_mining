@@ -45,6 +45,7 @@ public class DiggerAgent extends WorkerAgent {
     private String movement;
     private AID assigned_pros;
     private int[] movingToPos;
+    private MessageTemplate template;
     
     private int maxCapacity;
     
@@ -110,7 +111,7 @@ public class DiggerAgent extends WorkerAgent {
         log("Pros coor ready");
         
         
-        MessageTemplate template = MessageTemplate.and(
+        template = MessageTemplate.and(
                 MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
                 MessageTemplate.MatchPerformative(ACLMessage.CFP));
 
@@ -206,5 +207,13 @@ public class DiggerAgent extends WorkerAgent {
     
     public void setMovingToPos(int row, int col) {
         this.movingToPos = new int[]{row, col};
+    }
+    
+    public MessageTemplate getTemplate(){
+        return template;
+    } 
+    
+    public void restartContractNetBehaviour(){
+        this.addBehaviour(new ContractNetResponderBehaviour(this, template));
     }
 }
