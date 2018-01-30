@@ -5,18 +5,22 @@
  */
 package AStar;
 
+import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.CellType;
+
 /**
  *
  * @author Antonio
  */
-public class Node {
+public abstract class Node extends Cell{
     
     private int x,y;
     private float f,g,h;
     private Node parent;
     
-    public Node(int x,int y, float f, float g, float h, Node parent)
+    public Node(int row, int col,int x,int y, float f, float g, float h, Node parent)
     {
+        super(CellType.PATH,row,col);
         this.x=x;
         this.y=y;
         this.f=f;
