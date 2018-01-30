@@ -10,6 +10,9 @@ import cat.urv.imas.agent.ProspectorAgent;
 import cat.urv.imas.agent.WorkerAgent;
 import cat.urv.imas.onthology.MessageContent;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -24,14 +27,7 @@ public class RequesterBehaviorDigger extends RequesterAgentBehaviour{
     
     @Override
     protected void handleInform(ACLMessage msg) {
-        if(msg.getContent().startsWith(MessageContent.GET_AREA)) {
-            
-            
-            
-        }
-        else{
-            super.handleInform(msg);
-        }
+        super.handleInform(msg);
     }
     
 }

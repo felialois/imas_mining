@@ -81,6 +81,10 @@ public class DiggerAgent extends WorkerAgent {
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
         this.coordinator = UtilsAgents.searchAgent(this, searchCriterion);
+        
+        searchCriterion = new ServiceDescription();
+        searchCriterion.setType(AgentType.SYSTEM.toString());
+        this.system = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
 
         // Waits for the ready message from the coor
@@ -215,5 +219,30 @@ public class DiggerAgent extends WorkerAgent {
     
     public void restartContractNetBehaviour(){
         this.addBehaviour(new ContractNetResponderBehaviour(this, template));
+    }
+    
+    public void actionTurn() {
+        ACLMessage move = new ACLMessage(ACLMessage.INFORM);
+        move.addReceiver(system);
+        switch (actState){
+            case MOVING:
+                if(movement.equals(MessageContent.RANDOM)) {
+                    
+                } else{
+                    return;
+                }
+                break;
+            case DIGGING:
+                
+                break;
+            case GOING_TO_DIG:
+                
+                break;
+            case RETRIEVING_METAL:
+                
+            default:
+                break;
+        }
+        send(move);
     }
 }

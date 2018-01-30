@@ -21,6 +21,7 @@ import cat.urv.imas.onthology.InfoAgent;
 public class WorkerAgent extends ImasAgent{
     
     protected AID coordinator;
+    protected AID system;
     protected GameSettings game;
     protected int column, row;  
     
