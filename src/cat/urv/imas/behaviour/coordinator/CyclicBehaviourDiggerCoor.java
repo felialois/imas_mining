@@ -43,6 +43,7 @@ public class CyclicBehaviourDiggerCoor extends CyclicBehaviour{
             try{
                 reply.setContentObject(agent.getGame());
                 reply.setPerformative(ACLMessage.INFORM);
+                agent.addDigger(msg.getSender());
             } catch (Exception e) {
                 reply.setPerformative(ACLMessage.FAILURE);
                 agent.errorLog(e.toString());

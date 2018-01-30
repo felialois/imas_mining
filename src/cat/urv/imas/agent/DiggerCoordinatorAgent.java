@@ -21,7 +21,9 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -49,7 +51,7 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
     private long[] y_min_positions;
     private long[] x_max_positions;
     private long[] y_max_positions;
-    private List<AID> diggers;
+    private Set<AID> diggers;
     
     @Override
     public void setGame(GameSettings game) {
@@ -93,7 +95,7 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent{
         numDiggers = 0;
         actDigger = 0;
         
-        diggers = new ArrayList<>();
+        diggers = new HashSet<>();
         
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
