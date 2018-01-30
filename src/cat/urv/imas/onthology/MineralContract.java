@@ -31,11 +31,35 @@ public class MineralContract {
     public String toString(){
         return x+" , "+y;
     }
-    
+
     @Override
-    public boolean equals(Object o){
-        MineralContract o2 = (MineralContract) o;
-        return (o2.getX()==this.x) && (o2.getY()==this.y);
+    public int hashCode() {
+        int hash = 7;
+        hash = 17 * hash + this.x;
+        hash = 17 * hash + this.y;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MineralContract other = (MineralContract) obj;
+        if (this.x != other.x) {
+            return false;
+        }
+        if (this.y != other.y) {
+            return false;
+        }
+        return true;
     }
     
+
 }

@@ -255,14 +255,19 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent {
     }
     
     public void addContractBid(int x, int y, AID digger, int proposal){
-        log("Bid made to contract:" + x+" , "+y);
         MineralContract mc = new MineralContract(x,y);
         if(contracts.containsKey(mc)){
             List<MineralBid> get = contracts.get(mc);
             get.add(new MineralBid(digger, proposal));
             contracts.put(new MineralContract(x,y), get);
+            log("Another Bid made to contract:" + x+" , "+y);
+
         }else{
-            System.out.print("Contract "+mc+" is not in map.");
+            List<MineralBid> get = new ArrayList<>();
+            get.add(new MineralBid(digger, proposal));
+            contracts.put(new MineralContract(x,y), get);
+            log("First Bid made to contract:" + x+" , "+y);
+
         }
             
             
@@ -273,7 +278,7 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent {
 
         // Fill the CFP message
         ACLMessage msg = new ACLMessage(ACLMessage.CFP);
-        System.out.println("Contract net for "+diggers.size());
+        System.out.println("Contract net for "+xLocation+" , "+yLocation);
         this.addContract(xLocation, yLocation);
 
         for (AID d : diggers) {

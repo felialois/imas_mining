@@ -73,34 +73,36 @@ public class ContractNetInitiatorBehaviour extends ContractNetInitiator {
                         msg.getSender(), Integer.parseInt(content[2]));
                 x = Integer.parseInt(content[0]);
                 y = Integer.parseInt(content[1]);
-                
+
             }
-        }
-        
-        MineralContract mc = new MineralContract(x,y);
-        if (!agent.getContracts().containsKey(mc)){
-            System.out.print("Contract not in map");
-            throw new UnsupportedOperationException();
         }
 
-        for (MineralBid contract : agent.getContracts().get(mc)) {
-            ACLMessage reply = new ACLMessage(ACLMessage.CFP);
-            reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
-            reply.setContent(MessageContent.CONTRACT_REJECT);
-            acceptances.addElement(reply);
-            int proposal = contract.getProposal();
-            if (proposal > bestProposal) {
-                bestProposal = proposal;
-                bestProposer = contract.getDigger();
-                accept = reply;
+        MineralContract mc = new MineralContract(x, y);
+        if (agent.getContracts().containsKey(mc)) {
+            
+            for (MineralBid contract : agent.getContracts().get(mc)) {
+                ACLMessage reply = new ACLMessage(ACLMessage.CFP);
+                reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
+                reply.setContent(MessageContent.CONTRACT_REJECT);
+                reply.addReceiver(contract.getDigger());
+                acceptances.addElement(reply);
+                int proposal = contract.getProposal();
+                if (proposal > bestProposal) {
+                    bestProposal = proposal;
+                    bestProposer = contract.getDigger();
+                    accept = reply;
+                }
             }
-        }
-        // Accept the proposal of the best proposer
-        if (accept != null) {
-            System.out.println("Accepting proposal " + bestProposal
-                    + " from responder " + bestProposer.getName());
-            accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-            accept.setContent(MessageContent.CONTRACT_ASIGN+x+","+y);
+            // Accept the proposal of the best proposer
+            if (accept != null) {
+                System.out.println("Accepting proposal " + bestProposal
+                        + " from responder " + bestProposer.getName());
+                accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                accept.setContent(MessageContent.CONTRACT_ASIGN + x + "," + y);
+            }
+        } else {
+            System.out.print("Contract " + x + " , " + y + " not in map");
+
         }
     }
 

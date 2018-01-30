@@ -61,7 +61,9 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
         } else if(msg.getContent().equals(MessageContent.RANDOM)) {
             agent.setMovement(MessageContent.RANDOM);
             agent.log("Set movement random");
-        } else try {
+        } else if(msg.getContent().contains(MessageContent.CONTRACT_REJECT)) {
+            agent.log("Bid Lost");
+        }else try {
             if(msg.getContentObject() instanceof AID) {
                 agent.setMovement("Follow prospector");
                 agent.setAssignedProspector((AID)msg.getContentObject());
