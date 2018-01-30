@@ -40,7 +40,7 @@ public class DiggerAgent extends WorkerAgent {
     public enum DiggerState{MOVING, GOING_TO_DIG, 
     DIGGING, RETRIEVING_METAL};
     
-    public DiggerState actState;
+    private DiggerState actState;
 
     private String movement;
     private AID assigned_pros;
@@ -229,19 +229,26 @@ public class DiggerAgent extends WorkerAgent {
         switch (actState){
             case MOVING:
                 if(movement.equals(MessageContent.RANDOM)) {
-                    
+                    // Decide a random movement
+                    // Send the movement to the system
                 } else{
+                    // Wait for the prospector message and move to the position given
                     return;
                 }
                 break;
             case DIGGING:
-                
+                // Dig one metal and add it to the map
+                // Check if the digger can load more or there are more metal
+                // If the digger cannot dig more change the state
+                // Send a message to the system with the dig
+                // Send a message to the system with the movement
                 break;
             case GOING_TO_DIG:
-                
+                // Apply AStar
+                // Send the movement to the system, going to the digging point
                 break;
             case RETRIEVING_METAL:
-                
+                // Send the movement to the system, going to the best MC
             default:
                 break;
         }

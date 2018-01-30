@@ -57,7 +57,7 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
         if(content.startsWith(MessageContent.CONTRACT_ASIGN)) {
             String[] location = content.replace(MessageContent.CONTRACT_ASIGN, "").split(",");
             agent.log("Bid Won Location "+location[0]+" ,"+location[1]);
-            agent.actState = DiggerAgent.DiggerState.GOING_TO_DIG;
+            agent.setState(DiggerAgent.DiggerState.GOING_TO_DIG);
             agent.restartContractNetBehaviour();
         } else if(msg.getContent().equals(MessageContent.RANDOM)) {
             agent.setMovement(MessageContent.RANDOM);
