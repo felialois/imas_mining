@@ -46,4 +46,8 @@ public class MessageContent {
     
     public static final String PROS_ASSIGNED = "Prospectors assigned";
     
+    public static final String EXTRACT_METAL = "Extract metal";
+            
+    public static final String METAL_TO_MC = "Metal given to manufacturing center";
+    
 }

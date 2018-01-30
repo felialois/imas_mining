@@ -17,17 +17,24 @@
  */
 package cat.urv.imas.agent;
 
+import cat.urv.imas.behaviour.coordinator.CyclicMessagingSystem;
+import cat.urv.imas.behaviour.system.CyclicSystemBehaviour;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
-import cat.urv.imas.behaviour.system.CyclicSystemBehaviour;
+import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.CellType;
+import cat.urv.imas.map.FieldCell;
+import cat.urv.imas.map.ManufacturingCenterCell;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.*;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
+import java.util.List;
 
 /**
  * System agent that controls the GUI and loads initial configuration settings.
@@ -168,7 +175,28 @@ public class SystemAgent extends ImasAgent {
         ready.addReceiver(this.coordinatorAgent);
         send(ready);
         
-        //this.addBehaviour(new CyclicSystemBehaviour(this));
+        SequentialBehaviour seq_behaviour = new SequentialBehaviour();
+        seq_behaviour.addSubBehaviour(new CyclicSystemBehaviour(this));
+        seq_behaviour.addSubBehaviour(new CyclicMessagingSystem(this));
+        this.addBehaviour(seq_behaviour);
+    }
+    
+    public void extractMetal(int row, int col) {
+        FieldCell fieldMetal = (FieldCell)game.get(row, col);
+        fieldMetal.removeMetal();
+    }
+    
+    public void metalToMC(int units, int row, int col) {
+        List<Cell> mcs = game.getCellsOfType().get(CellType.MANUFACTURING_CENTER);
+        int[] prices = game.getManufacturingCenterPrice();
+        for(int i = 0; i < mcs.size(); i++) {
+            Cell mc = mcs.get(i);
+            if(mc.getRow() == row && mc.getCol() == col) {
+                int points = units * prices[i];
+                log("Won " + points + " points");
+                return;
+            }
+        }
     }
     
     public void updateGUI() {
