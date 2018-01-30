@@ -1,23 +1,23 @@
-/**
- *  IMAS base code for the practical work.
- *  Copyright (C) 2014 DEIM - URV
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ /**
+  *  IMAS base code for the practical work.
+  *  Copyright (C) 2014 DEIM - URV
+  *
+  *  This program is free software: you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+  *  the Free Software Foundation, either version 3 of the License, or
+  *  (at your option) any later version.
+  *
+  *  This program is distributed in the hope that it will be useful,
+  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *  GNU General Public License for more details.
+  *
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
 package cat.urv.imas.agent;
 
-import cat.urv.imas.behaviour.coordinator.CyclicMessagingSystem;
+import cat.urv.imas.behaviour.system.CyclicMessagingSystem;
 import cat.urv.imas.behaviour.system.CyclicSystemBehaviour;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
@@ -27,6 +27,8 @@ import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.CellType;
 import cat.urv.imas.map.FieldCell;
 import cat.urv.imas.map.ManufacturingCenterCell;
+import cat.urv.imas.map.PathCell;
+import cat.urv.imas.onthology.InfoAgent;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.*;
 import jade.core.behaviours.SequentialBehaviour;
@@ -35,6 +37,7 @@ import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
 import java.util.List;
+import java.util.Map;
 
 /**
  * System agent that controls the GUI and loads initial configuration settings.
@@ -57,6 +60,9 @@ public class SystemAgent extends ImasAgent {
      * round.
      */
     private AID coordinatorAgent;
+    
+    private int numDiggers;
+    private int numProspectors;
     
     /**
      * Builds the System agent.
@@ -154,6 +160,8 @@ public class SystemAgent extends ImasAgent {
         
         // Initialize agents
         this.game.createAgents();
+        numDiggers = game.getNumberOfDiggers();
+        numProspectors = game.getNumberOfProspectors();
         
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
@@ -179,6 +187,67 @@ public class SystemAgent extends ImasAgent {
         seq_behaviour.addSubBehaviour(new CyclicSystemBehaviour(this));
         seq_behaviour.addSubBehaviour(new CyclicMessagingSystem(this));
         this.addBehaviour(seq_behaviour);
+    }
+    
+    public void actualize(int[][] prevDiggerPos, int[][] nextDiggerPos,
+            int[][] prevProsPos, int[][] nextProsPos) {
+        Cell[][] map = game.getMap();
+        Map<AgentType, List<Cell>> agentList = game.getAgentList();
+        
+        for(int i = 0; i < prevDiggerPos.length; i++) {
+            PathCell prevCell = (PathCell) map[prevDiggerPos[i][0]][prevDiggerPos[i][1]];
+            PathCell nextCell = (PathCell) map[nextDiggerPos[i][0]][nextDiggerPos[i][1]];
+            List<InfoAgent> list = prevCell.getAgents().get(AgentType.DIGGER);
+            InfoAgent agent = null;
+            int j = 0;
+            while(agent == null) {
+                String name = list.get(j).getAID().getName();
+                if(name.substring(3, name.indexOf("@")).equals(""+i)) {
+                    agent = list.get(j);
+                }
+                j++;
+            }
+            try{
+                prevCell.removeAgent(agent);
+                nextCell.addAgent(agent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            agentList.get(AgentType.DIGGER).set(i, nextCell);
+        }
+        
+        for(int i = 0; i < prevProsPos.length; i++) {
+            PathCell prevCell = (PathCell) map[prevProsPos[i][0]][prevProsPos[i][1]];
+            PathCell nextCell = (PathCell) map[nextProsPos[i][0]][nextProsPos[i][1]];
+            List<InfoAgent> list = prevCell.getAgents().get(AgentType.PROSPECTOR);
+            InfoAgent agent = null;
+            int j = 0;
+            while(agent == null) {
+                String name = list.get(j).getAID().getName();
+                if(name.substring(3, name.indexOf("@")).equals(""+i)) {
+                    agent = list.get(j);
+                }
+                j++;
+            }
+            try{
+                prevCell.removeAgent(agent);
+                nextCell.addAgent(agent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            agentList.get(AgentType.PROSPECTOR).set(i, nextCell);
+        }
+        game.setAgentList(agentList);
+    }
+    
+    public int getNumDiggers() {
+        return numDiggers;
+    }
+    
+    public int getNumProspectors() {
+        return numProspectors;
     }
     
     public void extractMetal(int row, int col) {

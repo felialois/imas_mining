@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cat.urv.imas.behaviour.coordinator;
+package cat.urv.imas.behaviour.system;
 
 import cat.urv.imas.agent.SystemAgent;
 import cat.urv.imas.onthology.MessageContent;
