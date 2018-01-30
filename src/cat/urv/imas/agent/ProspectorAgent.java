@@ -75,6 +75,10 @@ public class ProspectorAgent extends WorkerAgent{
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
         this.coordinator = UtilsAgents.searchAgent(this, searchCriterion);
+        
+        searchCriterion = new ServiceDescription();
+        searchCriterion.setType(AgentType.SYSTEM.toString());
+        this.system = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
         
         // Waits for the ready message from the coor
@@ -158,5 +162,9 @@ public class ProspectorAgent extends WorkerAgent{
         Cell actPos = game.getAgentList().get(AgentType.PROSPECTOR).get(agentNum);
         this.setRow(actPos.getRow());
         this.setColumn(actPos.getCol());
+    }
+    
+    public void actionTurn() {
+        
     }
 }

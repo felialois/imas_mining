@@ -45,6 +45,7 @@ public class RequesterAgentBehaviour extends AchieveREInitiator {
         agent.log("INFORM received from " + ((AID) msg.getSender()).getLocalName());
         try {
             GameSettings game = (GameSettings) msg.getContentObject();
+            System.out.println(game);
             agent.setGame(game);
             agent.log(game.getShortString());
             agent.setRow(agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,agent.getName().indexOf("@")))).getRow());

@@ -30,7 +30,6 @@ public class RequesterBehaviorProspector extends RequesterAgentBehaviour{
     @Override
     protected void handleInform(ACLMessage msg) {
         if(msg.getContent().startsWith(MessageContent.GET_AREA)) {
-
             try{
                 String content = msg.getContent();
                 ProspectorAgent prs = (ProspectorAgent) myAgent;
@@ -38,8 +37,6 @@ public class RequesterBehaviorProspector extends RequesterAgentBehaviour{
             } catch(Exception e){
                 e.printStackTrace();
             }
-            
-            
         }
         else{
             super.handleInform(msg);
