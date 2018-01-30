@@ -22,8 +22,8 @@ import java.util.logging.Logger;
  *
  * @author santi
  */
-public class CyclicBehaviourDiggerCoor extends CyclicBehaviour{
-    
+public class CyclicBehaviourDiggerCoor extends CyclicBehaviour {
+
     Queue<AID> queueDiggers = new LinkedList<AID>();
 
     public CyclicBehaviourDiggerCoor(Agent a) {
@@ -33,14 +33,15 @@ public class CyclicBehaviourDiggerCoor extends CyclicBehaviour{
     @Override
     public void action() {
         ACLMessage msg = myAgent.receive();
-        if(msg == null)
+        if (msg == null) {
             return;
-        
+        }
+
         String content = msg.getContent();
-        DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent)this.getAgent();
-        if(content.equals(MessageContent.GET_MAP)) {
+        DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent) this.getAgent();
+        if (content.equals(MessageContent.GET_MAP)) {
             ACLMessage reply = msg.createReply();
-            try{
+            try {
                 reply.setContentObject(agent.getGame());
                 reply.setPerformative(ACLMessage.INFORM);
                 agent.addDigger(msg.getSender());
@@ -50,19 +51,19 @@ public class CyclicBehaviourDiggerCoor extends CyclicBehaviour{
                 e.printStackTrace();
             }
             agent.send(reply);
-            
+
             agent.addDigger(msg.getSender());
             agent.log("Map sent to digger");
-        } else if(content.equals(MessageContent.GET_MOVEMENT)){
+        } else if (content.equals(MessageContent.GET_MOVEMENT)) {
             ACLMessage reply = msg.createReply();
             reply.setPerformative(ACLMessage.INFORM);
-            try{
+            try {
                 boolean prospector = agent.getAssignedProspector();
-                if(!prospector) {
+                if (!prospector) {
                     reply.setContent(MessageContent.RANDOM);
                     agent.send(reply);
                     agent.log("Set movement random");
-                } else{
+                } else {
                     queueDiggers.add(msg.getSender());
                     agent.log("Waiting for assigned prospector");
                 }
@@ -72,44 +73,58 @@ public class CyclicBehaviourDiggerCoor extends CyclicBehaviour{
                 agent.errorLog(e.toString());
                 e.printStackTrace();
             }
-        } else if(content.startsWith(MessageContent.AREAS)) {
-            agent.setAreas(content.substring(MessageContent.AREAS.length()+1));
-        } else if(content.startsWith(MessageContent.METAL)) {
+        } else if (content.startsWith(MessageContent.AREAS)) {
+            agent.setAreas(content.substring(MessageContent.AREAS.length() + 1));
+        } else if (content.startsWith(MessageContent.METAL)) {
             // Empezar la subasta
-        } else try {
-            if(msg.getContentObject() instanceof AID) {
-                AID prospector = (AID)msg.getContentObject();
-                AID digger = queueDiggers.poll();
-                
-                // Message to digger with the AID of the prospector
-                ACLMessage messageDigger = new ACLMessage(ACLMessage.INFORM);
-                messageDigger.addReceiver(digger);
-                try {
-                    messageDigger.setContentObject(prospector);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                agent.send(messageDigger);
-                agent.log("Sent assigned prospector to digger");
-                
-                // Message to prospector with the AID of the digger
-                ACLMessage messageProspector = new ACLMessage(ACLMessage.INFORM);
-                messageProspector.addReceiver(prospector);
-                try {
-                    messageProspector.setContentObject(digger);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                agent.send(messageProspector);
-                agent.log("Sent assigned digger to prospector");
-                
-            } else{
-                agent.errorLog("Error: " + content);
+            String[] split = content.replace(MessageContent.METAL, "").split(",");
+            agent.startAuction(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+        } else if (content.startsWith(MessageContent.CONTRACT_BID)) {
+            if (msg.getPerformative() == ACLMessage.PROPOSE) {
+
+                String[] cnt = msg.getContent().replace(MessageContent.CONTRACT_BID, "").split(",");
+
+                agent.addContractBid(Integer.parseInt(cnt[0]), Integer.parseInt(cnt[1]),
+                        msg.getSender(), Integer.parseInt(cnt[2]));
             }
-        } catch (UnreadableException ex) {
-            Logger.getLogger(CyclicBehaviourDiggerCoor.class.getName())
-                    .log(Level.SEVERE, null, ex);
+        } else {
+            try {
+                if (msg.getContentObject() instanceof AID) {
+                    AID prospector = (AID) msg.getContentObject();
+                    AID digger = queueDiggers.poll();
+
+                    // Message to digger with the AID of the prospector
+                    ACLMessage messageDigger = new ACLMessage(ACLMessage.INFORM);
+                    messageDigger.addReceiver(digger);
+                    try {
+                        messageDigger.setContentObject(prospector);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    agent.send(messageDigger);
+                    agent.log("Sent assigned prospector to digger");
+
+                    // Message to prospector with the AID of the digger
+                    ACLMessage messageProspector = new ACLMessage(ACLMessage.INFORM);
+                    messageProspector.addReceiver(prospector);
+                    try {
+                        messageProspector.setContentObject(digger);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    agent.send(messageProspector);
+                    agent.log("Sent assigned digger to prospector");
+
+                } else {
+                    agent.errorLog("Error: " + content);
+                }
+            } catch (Exception ex) {
+                System.out.print("ERROR MSG RECEIVED:" + msg.getContent() + "\n");
+
+//            Logger.getLogger(CyclicBehaviourDiggerCoor.class.getName())
+//                    .log(Level.SEVERE, null, ex);
+            }
         }
     }
-    
+
 }

@@ -54,8 +54,10 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
         
         String content = msg.getContent();
         DiggerAgent agent = (DiggerAgent)this.getAgent();
-        if(content.equals(MessageContent.METAL)) {
-            // Mandar puja
+        if(content.startsWith(MessageContent.CONTRACT_ASIGN)) {
+            String[] location = content.replace(MessageContent.CONTRACT_ASIGN, "").split(",");
+            agent.log("Bid Won Location "+location[0]+" ,"+location[1]);
+            
         } else if(msg.getContent().equals(MessageContent.RANDOM)) {
             agent.setMovement(MessageContent.RANDOM);
             agent.log("Set movement random");

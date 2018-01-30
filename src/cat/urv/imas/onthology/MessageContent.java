@@ -50,4 +50,16 @@ public class MessageContent {
             
     public static final String METAL_TO_MC = "Metal given to manufacturing center";
     
+    public static final String CONTRACT_PROPOSE = "Contract Propose";
+    
+    public static final String CONTRACT_ACCEPT = "Contract Accept";
+    
+    public static final String CONTRACT_REJECT = "Contract Reject";
+    
+    public static final String CONTRACT_ASIGN = "Contract Assign";
+    
+    public static final String CONTRACT_BID = "Contract Bid";
+
+
+    
 }
