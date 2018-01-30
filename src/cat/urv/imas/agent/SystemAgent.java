@@ -17,7 +17,6 @@
   */
 package cat.urv.imas.agent;
 
-import cat.urv.imas.behaviour.system.CyclicMessagingSystem;
 import cat.urv.imas.behaviour.system.CyclicSystemBehaviour;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
@@ -173,7 +172,6 @@ public class SystemAgent extends ImasAgent {
         // we wait for the initialization of the game
         MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
         
-        this.addBehaviour(new RequestResponseBehaviour(this, mt));
         
         // Setup finished. When the last inform is received, the agent itself will add
         // a behaviour to send/receive actions
@@ -184,8 +182,8 @@ public class SystemAgent extends ImasAgent {
         send(ready);
         
         SequentialBehaviour seq_behaviour = new SequentialBehaviour();
+        seq_behaviour.addSubBehaviour(new RequestResponseBehaviour(this, mt));
         seq_behaviour.addSubBehaviour(new CyclicSystemBehaviour(this));
-        seq_behaviour.addSubBehaviour(new CyclicMessagingSystem(this));
         this.addBehaviour(seq_behaviour);
     }
     

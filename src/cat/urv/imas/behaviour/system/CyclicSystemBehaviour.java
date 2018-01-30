@@ -41,17 +41,45 @@ public class CyclicSystemBehaviour extends CyclicBehaviour{
     @Override
     public void action() {
         SystemAgent agent = (SystemAgent)this.getAgent();
+        
+        ACLMessage msg = myAgent.receive();
+        if(msg == null)
+            return;
+        
         receivedDiggers = 0;
         receivedProspectors = 0;
         prevDiggerPos = new int[agent.getNumDiggers()][2];
         nextDiggerPos = new int[agent.getNumDiggers()][2];
         prevProsPos = new int[agent.getNumProspectors()][2];
         nextProsPos = new int[agent.getNumProspectors()][2];
-        // Waits for the message of all of the workers
-        while(receivedDiggers < agent.getNumDiggers() &&
-                receivedProspectors < agent.getNumProspectors()) {
-            ACLMessage msg = agent.receive();
+        
+        String content = msg.getContent();
+        if(content.equals(MessageContent.GET_MAP)) {
+            // Agents wants a map
+            ACLMessage reply = msg.createReply();
+            try {
+                if (content.equals(MessageContent.GET_MAP)) {
+                    agent.log("Request received");
+                    reply.setPerformative(ACLMessage.AGREE);
+                }
+            } catch (Exception e) {
+                reply.setPerformative(ACLMessage.FAILURE);
+                agent.errorLog(e.getMessage());
+                e.printStackTrace();
+            }
+            agent.log("Response being prepared");
+            agent.send(reply);
+        } else if(content.startsWith(MessageContent.EXTRACT_METAL)) {
+            String coord_string = content.substring(MessageContent.EXTRACT_METAL.length() + 1);
+            String[] coord = coord_string.split(",");
+            agent.extractMetal(Integer.parseInt(coord[0]), Integer.parseInt(coord[1]));
+        } else if(content.startsWith(MessageContent.METAL_TO_MC)) {
+            String coord_string = content.substring(MessageContent.METAL_TO_MC.length() + 1);
+            String[] coord = coord_string.split(",");
+            agent.metalToMC(Integer.parseInt(coord[0]), Integer.parseInt(coord[1]), Integer.parseInt(coord[2]));
+        } else{
             
+            // Waits for the message of all of the workers
             try {
                 int[] pos = (int[])msg.getContentObject();
                 String type = msg.getSender().getName().substring(0, 3);
@@ -73,51 +101,55 @@ public class CyclicSystemBehaviour extends CyclicBehaviour{
                 e.printStackTrace();
             }
         }
-        // Actualize the map
-        agent.actualize(prevDiggerPos, nextDiggerPos, prevProsPos, nextProsPos);
-        agent.log("UPDATE GUI");
-        agent.updateGUI();
         
-        // Send the map to all the agents
-        try {
-            ACLMessage msg = new ACLMessage(ACLMessage.UNKNOWN);
-            msg.setContentObject(agent.getGame());
-            // Coordinator
-            ServiceDescription searchCriterion = new ServiceDescription();
-            searchCriterion.setType(AgentType.COORDINATOR.toString());
-            msg.addReceiver(UtilsAgents.searchAgent(agent, searchCriterion));
-            // Digger coordinator
-            searchCriterion = new ServiceDescription();
-            searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
-            msg.addReceiver(UtilsAgents.searchAgent(agent, searchCriterion));
-            // Prospector coordinator
-            searchCriterion = new ServiceDescription();
-            searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
-            msg.addReceiver(UtilsAgents.searchAgent(agent, searchCriterion));
-            // Diggers
-            DFAgentDescription DFDescription = new DFAgentDescription();
-            searchCriterion = new ServiceDescription();
-            searchCriterion.setType(AgentType.DIGGER.toString());
-            DFDescription.addServices(searchCriterion);
-            DFAgentDescription[] diggers = DFService.search(agent, DFDescription);
+        if(agent.getNumDiggers() == receivedDiggers &&
+                agent.getNumProspectors() == receivedProspectors) {
+            // Actualize the map
+            agent.actualize(prevDiggerPos, nextDiggerPos, prevProsPos, nextProsPos);
+            agent.log("UPDATE GUI");
+            agent.updateGUI();
             
-            for(int i = 0; i < diggers.length; i++)
-                msg.addReceiver(diggers[i].getName());
-            // Prospectors
-            DFDescription = new DFAgentDescription();
-            searchCriterion = new ServiceDescription();
-            searchCriterion.setType(AgentType.PROSPECTOR.toString());
-            DFDescription.addServices(searchCriterion);
-            DFAgentDescription[] prospectors = DFService.search(agent, DFDescription);
-            
-            for(int i = 0; i < prospectors.length; i++)
-                msg.addReceiver(prospectors[i].getName());
-            
-            agent.send(msg);
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        } catch (FIPAException e2) {
-            e2.printStackTrace();
+            // Send the map to all the agents
+            try {
+                msg = new ACLMessage(ACLMessage.UNKNOWN);
+                msg.setContentObject(agent.getGame());
+                // Coordinator
+                ServiceDescription searchCriterion = new ServiceDescription();
+                searchCriterion.setType(AgentType.COORDINATOR.toString());
+                msg.addReceiver(UtilsAgents.searchAgent(agent, searchCriterion));
+                // Digger coordinator
+                searchCriterion = new ServiceDescription();
+                searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
+                msg.addReceiver(UtilsAgents.searchAgent(agent, searchCriterion));
+                // Prospector coordinator
+                searchCriterion = new ServiceDescription();
+                searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
+                msg.addReceiver(UtilsAgents.searchAgent(agent, searchCriterion));
+                // Diggers
+                DFAgentDescription DFDescription = new DFAgentDescription();
+                searchCriterion = new ServiceDescription();
+                searchCriterion.setType(AgentType.DIGGER.toString());
+                DFDescription.addServices(searchCriterion);
+                DFAgentDescription[] diggers = DFService.search(agent, DFDescription);
+                
+                for(int i = 0; i < diggers.length; i++)
+                    msg.addReceiver(diggers[i].getName());
+                // Prospectors
+                DFDescription = new DFAgentDescription();
+                searchCriterion = new ServiceDescription();
+                searchCriterion.setType(AgentType.PROSPECTOR.toString());
+                DFDescription.addServices(searchCriterion);
+                DFAgentDescription[] prospectors = DFService.search(agent, DFDescription);
+                
+                for(int i = 0; i < prospectors.length; i++)
+                    msg.addReceiver(prospectors[i].getName());
+                
+                agent.send(msg);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } catch (FIPAException e2) {
+                e2.printStackTrace();
+            }
         }
     }
 }
