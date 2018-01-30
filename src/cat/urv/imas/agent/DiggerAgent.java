@@ -9,7 +9,10 @@ import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.agent.CyclicMessagingDigger;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorDigger;
 import cat.urv.imas.behaviour.coordinator.ContractNetResponderBehaviour;
+import cat.urv.imas.map.Cell;
+import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.MetalType;
 import jade.core.AID;
 import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
@@ -21,6 +24,8 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,9 +36,19 @@ import java.util.Random;
  * @author felipe
  */
 public class DiggerAgent extends WorkerAgent {
+    
+    public enum DiggerState{MOVING, GOING_TO_DIG, 
+    DIGGING, RETRIEVING_METAL};
+    
+    public DiggerState actState;
 
     private String movement;
     private AID assigned_pros;
+    private int[] movingToPos;
+    
+    private int maxCapacity;
+    
+    private Map<MetalType, Integer> metalCarried;
 
     public DiggerAgent() {
         super(AgentType.DIGGER);
@@ -146,13 +161,48 @@ public class DiggerAgent extends WorkerAgent {
         return null;
     }
 
-    public boolean performAction() {
-        return true;
-    }
-
     public int evaluateAction(int x, int y) {
-        Random r = new Random();
-        return 3;
+        return Math.abs(x-this.getRow()) + Math.abs(y-this.getColumn());
     }
-
+    
+    @Override
+    public void setGame(GameSettings game) {
+        maxCapacity = game.getDiggersCapacity();
+        metalCarried = new HashMap();
+        MetalType[] types = game.getManufacturingCenterMetalType();
+        for(MetalType type: types)
+            metalCarried.put(type, 0);
+        
+        actualizePos();
+        
+        super.setGame(game);
+    }
+    
+    public void actualizePos() {
+        String name = this.getAID().getName();
+        int agentNum = Integer.parseInt(name.substring(3, name.indexOf("@")));
+        Cell actPos = game.getAgentList().get(AgentType.DIGGER).get(agentNum);
+        this.setRow(actPos.getRow());
+        this.setColumn(actPos.getCol());
+    }
+    
+    public void extractMetal(MetalType type) {
+        metalCarried.put(type, metalCarried.get(type) + 1);
+    }
+    
+    public boolean hasSpaceAvailable() {
+        int total = 0;
+        for(int val: metalCarried.values()) {
+            total += val;
+        }
+        return total < maxCapacity;
+    }
+    
+    public void setState(DiggerState state) {
+        this.actState = state;
+    }
+    
+    public void setMovingToPos(int row, int col) {
+        this.movingToPos = new int[]{row, col};
+    }
 }

@@ -9,6 +9,8 @@ package cat.urv.imas.agent;
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.agent.CyclicMessagingPros;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorProspector;
+import cat.urv.imas.map.Cell;
+import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
@@ -148,7 +150,13 @@ public class ProspectorAgent extends WorkerAgent{
         }
         
         return null;
-    }    
-
+    }
     
+    public void actualizePos() {
+        String name = this.getAID().getName();
+        int agentNum = Integer.parseInt(name.substring(3, name.indexOf("@")));
+        Cell actPos = game.getAgentList().get(AgentType.PROSPECTOR).get(agentNum);
+        this.setRow(actPos.getRow());
+        this.setColumn(actPos.getCol());
+    }
 }
