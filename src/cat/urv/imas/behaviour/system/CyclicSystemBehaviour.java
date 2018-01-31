@@ -55,7 +55,7 @@ public class CyclicSystemBehaviour extends CyclicBehaviour{
         
         String content = msg.getContent();
         System.out.println("Received message from " + msg.getSender());
-        if(content.equals(MessageContent.GET_MAP)) {
+        if(content != null && content.equals(MessageContent.GET_MAP)) {
             // Agents wants a map
             ACLMessage reply = msg.createReply();
             try {
@@ -84,12 +84,12 @@ public class CyclicSystemBehaviour extends CyclicBehaviour{
             }
             agent.log("Game settings sent");
             agent.send(reply);
-        } else if(content.startsWith(MessageContent.EXTRACT_METAL)) {
+        } else if(content != null && content.startsWith(MessageContent.EXTRACT_METAL)) {
             String coord_string = content.substring(MessageContent.EXTRACT_METAL.length() + 1);
             String[] coord = coord_string.split(",");
             agent.log("Metal extraction");
             agent.extractMetal(Integer.parseInt(coord[0]), Integer.parseInt(coord[1]));
-        } else if(content.startsWith(MessageContent.METAL_TO_MC)) {
+        } else if(content != null && content.startsWith(MessageContent.METAL_TO_MC)) {
             String coord_string = content.substring(MessageContent.METAL_TO_MC.length() + 1);
             String[] coord = coord_string.split(",");
             agent.log("Metal to MC");
@@ -97,23 +97,23 @@ public class CyclicSystemBehaviour extends CyclicBehaviour{
         } else{
             // Waits for the message of all of the workers
             try {
-                int[] pos = (int[])msg.getContentObject();
+                String[] pos = content.split(",");
                 String type = msg.getSender().getName().substring(0, 3);
-                int numAgent = Integer.parseInt(type.substring(3, type.indexOf("@")));
+                int numAgent = Integer.parseInt(msg.getSender().getName().substring(3, msg.getSender().getName().indexOf("@")));
                 if(type.equals("dgg")) {
-                    prevDiggerPos[numAgent][0] = pos[0];
-                    prevDiggerPos[numAgent][1] = pos[1];
-                    nextDiggerPos[numAgent][0] = pos[2];
-                    nextDiggerPos[numAgent][1] = pos[3];
+                    prevDiggerPos[numAgent][0] = Integer.parseInt(pos[0]);
+                    prevDiggerPos[numAgent][1] = Integer.parseInt(pos[1]);
+                    nextDiggerPos[numAgent][0] = Integer.parseInt(pos[2]);
+                    nextDiggerPos[numAgent][1] = Integer.parseInt(pos[3]);
                     receivedDiggers++;
                 } else if(type.equals("prs")) {
-                    prevProsPos[numAgent][0] = pos[0];
-                    prevProsPos[numAgent][1] = pos[1];
-                    nextProsPos[numAgent][0] = pos[2];
-                    nextProsPos[numAgent][1] = pos[3];
+                    prevProsPos[numAgent][0] = Integer.parseInt(pos[0]);
+                    prevProsPos[numAgent][1] = Integer.parseInt(pos[1]);
+                    nextProsPos[numAgent][0] = Integer.parseInt(pos[2]);
+                    nextProsPos[numAgent][1] = Integer.parseInt(pos[3]);
                     receivedProspectors++;
                 }
-            } catch (UnreadableException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

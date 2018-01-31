@@ -45,6 +45,7 @@ public class CyclicMessagingPros extends CyclicBehaviour{
         String content = msg.getContent();
         ProspectorAgent agent = (ProspectorAgent)this.getAgent();
         try {
+            System.out.println(msg.getContentObject());
             if(msg.getContentObject() instanceof AID) {
                 if(!agent.diggerIsAssigned()){
                     agent.setAssignedDigger((AID)msg.getContentObject());

@@ -267,18 +267,9 @@ public class DiggerAgent extends WorkerAgent {
     public void sendMovToSys(int newRow, int newCol) {
         ACLMessage msgSys = new ACLMessage(ACLMessage.INFORM);
         msgSys.addReceiver(system);
-        int[] mov = new int[4];
-        mov[0] = row;
-        mov[1] = column;
-        mov[2] = newRow;
-        mov[3] = newCol;
-        try {
-            msgSys.setContentObject(mov);
-            send(msgSys);
-            log("Movement sent to system");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        msgSys.setContent(row + "," + column + "," + newRow + "," + newCol);
+        send(msgSys);
+        log("Movement sent to system");
     }
     
     public void actionTurn() {
