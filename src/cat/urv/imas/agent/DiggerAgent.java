@@ -1,8 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
 package cat.urv.imas.agent;
 
 import static cat.urv.imas.agent.ImasAgent.OWNER;
@@ -10,6 +10,7 @@ import cat.urv.imas.behaviour.agent.CyclicMessagingDigger;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorDigger;
 import cat.urv.imas.behaviour.coordinator.ContractNetResponderBehaviour;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import cat.urv.imas.onthology.MetalType;
@@ -24,6 +25,8 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -37,11 +40,11 @@ import java.util.Random;
  */
 public class DiggerAgent extends WorkerAgent {
     
-    public enum DiggerState{MOVING, GOING_TO_DIG, 
+    public enum DiggerState{MOVING, GOING_TO_DIG,
     DIGGING, RETRIEVING_METAL};
     
     private DiggerState actState;
-
+    
     private String movement;
     private AID assigned_pros;
     private int[] movingToPos;
@@ -50,17 +53,17 @@ public class DiggerAgent extends WorkerAgent {
     private int maxCapacity;
     
     private Map<MetalType, Integer> metalCarried;
-
+    
     public DiggerAgent() {
         super(AgentType.DIGGER);
     }
-
+    
     @Override
     public void setup() {
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
         /* ********************************************************************/
-
+        
         this.actState = DiggerState.MOVING;
         
         // Register the agent to the DF
@@ -68,7 +71,7 @@ public class DiggerAgent extends WorkerAgent {
         sd1.setType(AgentType.DIGGER.toString());
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
-
+        
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.addServices(sd1);
         dfd.setName(getAID());
@@ -88,7 +91,7 @@ public class DiggerAgent extends WorkerAgent {
         searchCriterion.setType(AgentType.SYSTEM.toString());
         this.system = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
-
+        
         // Waits for the ready message from the coor
         ACLMessage ready;
         do {
@@ -96,7 +99,7 @@ public class DiggerAgent extends WorkerAgent {
         } while (ready == null
                 || !MessageContent.READY.equals(ready.getContent()));
         log("Digger coor ready");
-
+        
         ACLMessage mapRequest = new ACLMessage(ACLMessage.REQUEST);
         mapRequest.addReceiver(this.coordinator);
         mapRequest.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
@@ -107,7 +110,7 @@ public class DiggerAgent extends WorkerAgent {
             log("error in message creation digger");
             e.printStackTrace();
         }
-
+        
         // Waits for the message of the Prospector Coordinator
         ACLMessage ready_pros;
         do {
@@ -120,7 +123,7 @@ public class DiggerAgent extends WorkerAgent {
         template = MessageTemplate.and(
                 MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
                 MessageTemplate.MatchPerformative(ACLMessage.CFP));
-
+        
         ParallelBehaviour parallelBehaviour = new ParallelBehaviour();
         parallelBehaviour.addSubBehaviour(new RequesterBehaviorDigger(this, mapRequest));
         parallelBehaviour.addSubBehaviour(new CyclicMessagingDigger(this));
@@ -128,46 +131,52 @@ public class DiggerAgent extends WorkerAgent {
         this.addBehaviour(parallelBehaviour);
         
     }
-
+    
     public AID getCoordinator() {
         return coordinator;
     }
-
+    
+    public AID getSystem() {
+        return system;
+    }
+    
     public void setMovement(String movement) {
         this.movement = movement;
     }
-
+    
     public String getMovement() {
         return movement;
     }
-
+    
     public void setAssignedProspector(AID prospector) {
         this.assigned_pros = prospector;
     }
-
+    
     public AID getAssignedProspector() {
         return assigned_pros;
     }
-
+    
     public int[] randomMovementDigger() {
-        int randomNumRow = ThreadLocalRandom.current().nextInt(-1, 2);
-        int randomNumCol = ThreadLocalRandom.current().nextInt(-1, 2);
-        int newRow = this.getRow() + randomNumRow;
-        int newCol = this.getColumn() + randomNumCol;
-        int result[] = new int[2];
-
-//        if (this.getGame().getMap()[newRow][newCol].getCellType().toString().equals("PATH")) {
-//            this.log("ROW " + this.getRow() + " COLUMN " + this.getColumn());
-//
-//            result[0] = newRow;
-//            result[1] = newCol;
-//
-//            return result;
-//        }
-
-        return null;
+        int x = getRow();
+        int y = getColumn();
+        Random r = new Random();
+        ArrayList<Cell> possibleMovs = new ArrayList<Cell>();
+        // Up
+        if(x > 0 && game.get(x-1, y) instanceof PathCell)
+            possibleMovs.add(game.get(x, y));
+        // Down
+        if(x < game.getMap().length && game.get(x+1, y) instanceof PathCell)
+            possibleMovs.add(game.get(x, y));
+        // Left
+        if(y > 0 && game.get(x, y-1) instanceof PathCell)
+            possibleMovs.add(game.get(x, y));
+        // Right
+        if(y < game.getMap()[0].length && game.get(x, y+1) instanceof PathCell)
+            possibleMovs.add(game.get(x, y));
+        Cell c = possibleMovs.get(r.nextInt(possibleMovs.size()));
+        return new int[]{c.getRow(), c.getCol()};
     }
-
+    
     public int evaluateAction(int x, int y) {
         int totalMetal = 0;
         for(int val: metalCarried.values())
@@ -221,10 +230,27 @@ public class DiggerAgent extends WorkerAgent {
     
     public MessageTemplate getTemplate(){
         return template;
-    } 
+    }
     
     public void restartContractNetBehaviour(){
         this.addBehaviour(new ContractNetResponderBehaviour(this, template));
+    }
+    
+    public void sendMovToSys(int newRow, int newCol) {
+        ACLMessage msgSys = new ACLMessage(ACLMessage.INFORM);
+        msgSys.addReceiver(system);
+        int[] mov = new int[4];
+        mov[0] = row;
+        mov[1] = column;
+        mov[2] = newRow;
+        mov[3] = newCol;
+        try {
+            msgSys.setContentObject(mov);
+            send(msgSys);
+            log("Movement sent to system");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     public void actionTurn() {
@@ -234,14 +260,16 @@ public class DiggerAgent extends WorkerAgent {
             case MOVING:
                 if(movement.equals(MessageContent.RANDOM)) {
                     // Decide a random movement
+                    int[] nextMov = randomMovementDigger();
                     // Send the movement to the system
+                    sendMovToSys(nextMov[0], nextMov[1]);
                 } else{
                     // Wait for the prospector message and move to the position given
                     return;
                 }
                 break;
             case DIGGING:
-                // Dig one metal and add it to the map
+                // Dig one metal and add it to the list
                 // Check if the digger can load more or there are more metal
                 // If the digger cannot dig more change the state and decide MC
                 // Send a message to the system with the dig

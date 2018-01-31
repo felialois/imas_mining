@@ -14,21 +14,13 @@ import cat.urv.imas.map.CellType;
  * @author Antonio
  */
 public class AStar {
-    private Node startingPoint;
-    private Node endingPoint;
     
-    public AStar(Node startingPoint,Node endingPoint,Cell[][] map)
-    {
-        this.startingPoint=startingPoint;
-        this.endingPoint=endingPoint;
-    }
-    
-    public Cell shortestPath(Node startingPoint,Node endingPoint,Cell[][] map)
+    public static Cell shortestPath(Node startingPoint,Node endingPoint,Cell[][] map)
     {
         ArrayList<Node> open = new ArrayList<Node>();
         ArrayList<Node> closed = new ArrayList<Node>();
         ArrayList<Node> succesors = new ArrayList<Node>();
-        Cell startingCell = map[startingPoint.getX()][startingPoint.getY()];
+        Cell startingCell = map[startingPoint.getRow()][startingPoint.getCol()];
         
         startingPoint.setF((float) 0);
         startingPoint.setG((float) 0);

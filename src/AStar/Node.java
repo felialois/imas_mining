@@ -14,29 +14,16 @@ import cat.urv.imas.map.CellType;
  */
 public abstract class Node extends Cell{
     
-    private int x,y;
     private float f,g,h;
     private Node parent;
     
-    public Node(int row, int col,int x,int y, float f, float g, float h, Node parent)
+    public Node(int row, int col, float f, float g, float h, Node parent)
     {
         super(CellType.PATH,row,col);
-        this.x=x;
-        this.y=y;
         this.f=f;
         this.g=g;
         this.h=h;
         this.parent=parent;
-    }
-    
-    public int getX()
-    {
-        return x;
-    }
-    
-    public int getY()
-    {
-        return y;
     }
     
     public float getF()
@@ -57,16 +44,6 @@ public abstract class Node extends Cell{
     public Node getParent()
     {
         return parent;
-    }
-    
-    public void setX(int x)
-    {
-        this.x=x;
-    }
-    
-    public void setY(int y)
-    {
-        this.y=y;
     }
     
     public void setF(float f)

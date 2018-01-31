@@ -40,6 +40,8 @@ public class MessageContent {
     
     public static final String RANDOM = "Random";
     
+    public static final String MOVE_TO = "Move to";
+    
     public static final String GET_PROS = "Get prospector";
     
     public static final String GET_PROS_BY_AREA = "Get prospector by area";
@@ -59,7 +61,4 @@ public class MessageContent {
     public static final String CONTRACT_ASIGN = "Contract Assign";
     
     public static final String CONTRACT_BID = "Contract Bid";
-
-
-    
 }

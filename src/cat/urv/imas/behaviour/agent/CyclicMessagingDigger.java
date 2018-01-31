@@ -5,33 +5,26 @@
 */
 package cat.urv.imas.behaviour.agent;
 
-import cat.urv.imas.behaviour.coordinator.*;
-import cat.urv.imas.agent.AgentType;
+import AStar.AStar;
+import AStar.Node;
 import cat.urv.imas.agent.DiggerAgent;
-import cat.urv.imas.agent.ProspectorAgent;
-import cat.urv.imas.agent.ProspectorCoordinatorAgent;
+import cat.urv.imas.map.Cell;
+import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.AMSAgentDescription;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.SearchConstraints;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.UnreadableException;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.IOException;
 
 /**
  *
  * @author santi
  */
 public class CyclicMessagingDigger extends CyclicBehaviour{
+    
+    private final String FOLLOW_PROS = "Follow prospector";
     
     public CyclicMessagingDigger(Agent a) {
         super(a);
@@ -62,12 +55,22 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
         } else if(msg.getContent().equals(MessageContent.RANDOM)) {
             agent.setMovement(MessageContent.RANDOM);
             agent.log("Set movement random");
-        } else if(msg.getContent().contains(MessageContent.CONTRACT_REJECT)) {
+        } else if(content.contains(MessageContent.CONTRACT_REJECT)) {
             agent.log("Bid Lost");
             agent.restartContractNetBehaviour();
-        }else try {
+        } else if(content.startsWith(MessageContent.MOVE_TO)) {
+            if(agent.getDiggerState().equals(DiggerAgent.DiggerState.MOVING) && 
+                    agent.getMovement().equals(FOLLOW_PROS)) {
+                String[] pos = content.substring(MessageContent.MOVE_TO.length() + 1).split(",");
+                GameSettings game = agent.getGame();
+                Cell nextMov = AStar.shortestPath((Node)game.get(agent.getRow(), agent.getColumn()),
+                    (Node)game.get(Integer.parseInt(pos[0]), Integer.parseInt(pos[1])), 
+                    game.getMap());
+                agent.sendMovToSys(nextMov.getRow(), nextMov.getCol());
+            }
+        } else try {
             if(msg.getContentObject() instanceof AID) {
-                agent.setMovement("Follow prospector");
+                agent.setMovement(FOLLOW_PROS);
                 agent.setAssignedProspector((AID)msg.getContentObject());
                 agent.log("Following prospector");
             } else{
