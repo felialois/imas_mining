@@ -29,7 +29,8 @@ public class BreadthFirstSearch {
         @Override
         public boolean equals(Object o) {
             Node node = (Node) o;
-            return node.cell.equals(this.cell);
+            return node.cell.getRow() == this.cell.getRow() &&
+                    node.cell.getCol() == this.cell.getCol();
         }
         
         public String toString(){
