@@ -6,6 +6,7 @@
 package cat.urv.imas.agent;
 
 import AStar.AStar;
+import AStar.BreadthFirstSearch;
 import AStar.Node;
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.agent.CyclicMessagingDigger;
@@ -323,8 +324,8 @@ public class DiggerAgent extends WorkerAgent {
                 break;
             case GOING_TO_DIG:
                 // Apply AStar
-                Cell nextMovDig = AStar.shortestPath((Node)game.get(row, column),
-                    (Node)game.get(movingToPos[0], movingToPos[1]), 
+                Cell nextMovDig = BreadthFirstSearch.shortestPath(game.get(row, column),
+                    game.get(movingToPos[0], movingToPos[1]), 
                     game.getMap());
                 // Send the movement to the system, going to the digging point
                 sendMovToSys(nextMovDig.getRow(), nextMovDig.getCol());
@@ -349,8 +350,8 @@ public class DiggerAgent extends WorkerAgent {
                     sendMovToSys(row, column);
                 } else{
                     // Apply AStar
-                    Cell nextMovMc = AStar.shortestPath((Node)game.get(row, column),
-                        (Node)game.get(movingToPos[0], movingToPos[1]), 
+                    Cell nextMovMc = BreadthFirstSearch.shortestPath(game.get(row, column),
+                        game.get(movingToPos[0], movingToPos[1]), 
                         game.getMap());
                     // Send the movement to the system, going to the best MC
                     sendMovToSys(nextMovMc.getRow(), nextMovMc.getCol());

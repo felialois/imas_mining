@@ -49,7 +49,6 @@ public class RequesterAgentBehaviour extends AchieveREInitiator {
         agent.log("INFORM received from " + ((AID) msg.getSender()).getLocalName());
         try {
             GameSettings game = (GameSettings) msg.getContentObject();
-            System.out.println(game.getShortString());
             if(digger != null)
                 digger.setGame(game);
             else
@@ -57,7 +56,7 @@ public class RequesterAgentBehaviour extends AchieveREInitiator {
             agent.log(game.getShortString());
             agent.setRow(agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,agent.getName().indexOf("@")))).getRow());
             agent.setColumn(agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,agent.getName().indexOf("@")))).getCol());
-            agent.log(agent.getRow()+","+agent.getColumn());
+            agent.log("Position: " + agent.getRow()+","+agent.getColumn());
         } catch (Exception e) {
             agent.errorLog("Incorrect content: " + e.toString());
         }
