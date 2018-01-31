@@ -94,7 +94,7 @@ public class CyclicBehaviourProsCoor extends CyclicBehaviour{
             msgMetal.setContent(content);
             msgMetal.addReceiver(agent.getCoordinatorAgent());
             agent.send(msgMetal);
-            agent.log("Metal found");
+            agent.log("Metal found in "+content);
         } else if(content.equals(MessageContent.GET_PROS)) {
             ACLMessage reply = msg.createReply();
             reply.setPerformative(ACLMessage.INFORM);

@@ -200,7 +200,7 @@ public class GameSettings implements java.io.Serializable {
             adjacentCellsX[2] =col-1;
         } else{
             adjacentCellsY[2] = row;
-            adjacentCellsX[2] = 0;
+            adjacentCellsX[2] = col;
         }
         if(col<map.length){
             adjacentCellsY[3] = row;
@@ -214,14 +214,14 @@ public class GameSettings implements java.io.Serializable {
             adjacentCellsY[0] = row-1;
             adjacentCellsX[0] = col;
         }else{
-            adjacentCellsY[0] = 0;
+            adjacentCellsY[0] = row;
             adjacentCellsX[0] = col;
         }
         if (row<map[0].length){
             adjacentCellsY[1] = row+1;
             adjacentCellsX[1] = col;
         }else{
-            adjacentCellsY[1] = 0;
+            adjacentCellsY[1] = row;
             adjacentCellsX[1] = col;
         }
         
