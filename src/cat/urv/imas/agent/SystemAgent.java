@@ -195,16 +195,9 @@ public class SystemAgent extends ImasAgent {
         for(int i = 0; i < prevDiggerPos.length; i++) {
             PathCell prevCell = (PathCell) map[prevDiggerPos[i][0]][prevDiggerPos[i][1]];
             PathCell nextCell = (PathCell) map[nextDiggerPos[i][0]][nextDiggerPos[i][1]];
+            System.out.println("Digger in " + prevDiggerPos[i][0] + ' ' + prevDiggerPos[i][1]);
             List<InfoAgent> list = prevCell.getAgents().get(AgentType.DIGGER);
-            InfoAgent agent = null;
-            int j = 0;
-            while(agent == null) {
-                String name = list.get(j).getAID().getName();
-                if(name.substring(3, name.indexOf("@")).equals(""+i)) {
-                    agent = list.get(j);
-                }
-                j++;
-            }
+            InfoAgent agent = list.get(0);
             try{
                 prevCell.removeAgent(agent);
                 nextCell.addAgent(agent);
@@ -219,15 +212,7 @@ public class SystemAgent extends ImasAgent {
             PathCell prevCell = (PathCell) map[prevProsPos[i][0]][prevProsPos[i][1]];
             PathCell nextCell = (PathCell) map[nextProsPos[i][0]][nextProsPos[i][1]];
             List<InfoAgent> list = prevCell.getAgents().get(AgentType.PROSPECTOR);
-            InfoAgent agent = null;
-            int j = 0;
-            while(agent == null) {
-                String name = list.get(j).getAID().getName();
-                if(name.substring(3, name.indexOf("@")).equals(""+i)) {
-                    agent = list.get(j);
-                }
-                j++;
-            }
+            InfoAgent agent = list.get(0);
             try{
                 prevCell.removeAgent(agent);
                 nextCell.addAgent(agent);
