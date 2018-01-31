@@ -41,8 +41,8 @@ public class ContractNetResponderBehaviour extends ContractNetResponder {
         
         int proposal = ((DiggerAgent)myAgent).evaluateAction(
                 Integer.parseInt(coord[0]),Integer.parseInt(coord[1]));
-        if (agent.actState.equals(DiggerAgent.DiggerState.MOVING)||
-                agent.actState.equals(DiggerAgent.DiggerState.RETRIEVING_METAL)){
+        if (agent.getDiggerState().equals(DiggerAgent.DiggerState.MOVING)||
+                agent.getDiggerState().equals(DiggerAgent.DiggerState.RETRIEVING_METAL)){
             // We provide a proposal
                 System.out.println("Agent " + myAgent.getName() + ": Proposing " + proposal);
                 ACLMessage propose = cfp.createReply();
@@ -62,7 +62,7 @@ public class ContractNetResponderBehaviour extends ContractNetResponder {
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
         System.out.println("Agent " + myAgent.getName()
                 + ": Proposal accepted");
-        if (((DiggerAgent)myAgent).actState.equals(DiggerAgent.DiggerState.GOING_TO_DIG)){
+        if (((DiggerAgent)myAgent).getDiggerState().equals(DiggerAgent.DiggerState.GOING_TO_DIG)){
             System.out.println("Agent " + myAgent.getName() + 
                     ": Action successfully performed");
             ACLMessage inform = accept.createReply();
