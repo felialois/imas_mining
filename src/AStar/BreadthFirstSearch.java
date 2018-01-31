@@ -37,8 +37,15 @@ public class BreadthFirstSearch {
         ArrayList<Node> visited = new ArrayList<Node>();
         q.add(new Node(startingPoint, null));
         Node actNode = null;
+        
+        System.out.println("NEW NODE");
+        System.out.println("START "+startingPoint.getRow()+" "+startingPoint.getCol());
+        System.out.println("END "+endingPoint.getRow()+" "+endingPoint.getCol());
+        
         while(!q.isEmpty()) {
             actNode = q.poll();
+            System.out.println("ACTUAL "+actNode.cell.getRow()+" "+actNode.cell.getCol());
+
             if(actNode.cell.equals(endingPoint)){
                 break;
             }
