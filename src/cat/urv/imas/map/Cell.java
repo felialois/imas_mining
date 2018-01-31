@@ -18,6 +18,7 @@
 package cat.urv.imas.map;
 
 import cat.urv.imas.gui.CellVisualizer;
+import java.util.Objects;
 
 /**
  * This class keeps all the information about a cell in the map.
@@ -135,4 +136,39 @@ public abstract class Cell implements java.io.Serializable {
     public String getMapMessage() {
         return "";
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 11 * hash + Objects.hashCode(this.type);
+        hash = 11 * hash + this.row;
+        hash = 11 * hash + this.col;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Cell other = (Cell) obj;
+        if (this.row != other.row) {
+            return false;
+        }
+        if (this.col != other.col) {
+            return false;
+        }
+        if (this.type != other.type) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 }

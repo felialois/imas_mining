@@ -39,8 +39,9 @@ public class BreadthFirstSearch {
         Node actNode = null;
         while(!q.isEmpty()) {
             actNode = q.poll();
-            if(actNode.cell.equals(endingPoint))
+            if(actNode.cell.equals(endingPoint)){
                 break;
+            }
             visited.add(actNode);
             // Up
             if(actNode.cell.getRow() > 0) {
