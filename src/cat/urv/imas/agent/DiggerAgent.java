@@ -207,6 +207,10 @@ public class DiggerAgent extends WorkerAgent {
         return totalMetal < maxCapacity;
     }
     
+    public DiggerState getDiggerState() {
+        return actState;
+    }
+    
     public void setState(DiggerState state) {
         this.actState = state;
     }
@@ -239,7 +243,7 @@ public class DiggerAgent extends WorkerAgent {
             case DIGGING:
                 // Dig one metal and add it to the map
                 // Check if the digger can load more or there are more metal
-                // If the digger cannot dig more change the state
+                // If the digger cannot dig more change the state and decide MC
                 // Send a message to the system with the dig
                 // Send a message to the system with the movement
                 break;
