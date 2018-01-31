@@ -26,8 +26,14 @@ public class BreadthFirstSearch {
             this.parent = parent;
         }
         
-        public boolean equals(Node node) {
+        @Override
+        public boolean equals(Object o) {
+            Node node = (Node) o;
             return node.cell.equals(this.cell);
+        }
+        
+        public String toString(){
+            return cell.getCol()+","+cell.getRow();
         }
     }
     
@@ -54,7 +60,7 @@ public class BreadthFirstSearch {
             if(actNode.cell.getRow() > 0) {
                 Cell c = map[actNode.cell.getRow()-1][actNode.cell.getCol()];
                 Node newNode = new Node(c, actNode);
-                if(!visited.contains(newNode) && c instanceof PathCell) {
+                if((!visited.contains(newNode)) && c instanceof PathCell) {
                     q.add(new Node(c, actNode));
                 }
             }
@@ -62,7 +68,7 @@ public class BreadthFirstSearch {
             if(actNode.cell.getRow() < map.length) {
                 Cell c = map[actNode.cell.getRow()+1][actNode.cell.getCol()];
                 Node newNode = new Node(c, actNode);
-                if(!visited.contains(newNode) && c instanceof PathCell) {
+                if((!visited.contains(newNode)) && c instanceof PathCell) {
                     q.add(new Node(c, actNode));
                 }
             }
@@ -70,7 +76,7 @@ public class BreadthFirstSearch {
             if(actNode.cell.getCol() > 0) {
                 Cell c = map[actNode.cell.getRow()][actNode.cell.getCol()-1];
                 Node newNode = new Node(c, actNode);
-                if(!visited.contains(newNode) && c instanceof PathCell) {
+                if((!visited.contains(newNode)) && c instanceof PathCell) {
                     q.add(new Node(c, actNode));
                 }
             }
@@ -78,7 +84,7 @@ public class BreadthFirstSearch {
             if(actNode.cell.getCol() < map[0].length) {
                 Cell c = map[actNode.cell.getRow()][actNode.cell.getCol()+1];
                 Node newNode = new Node(c, actNode);
-                if(!visited.contains(newNode) && c instanceof PathCell) {
+                if((!visited.contains(newNode)) && c instanceof PathCell) {
                     q.add(new Node(c, actNode));
                 }
             }
