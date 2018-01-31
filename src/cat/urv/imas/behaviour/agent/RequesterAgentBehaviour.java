@@ -6,6 +6,7 @@
 package cat.urv.imas.behaviour.agent;
 
 import cat.urv.imas.agent.CoordinatorAgent;
+import cat.urv.imas.agent.DiggerAgent;
 import cat.urv.imas.agent.WorkerAgent;
 import cat.urv.imas.onthology.GameSettings;
 import jade.core.AID;
@@ -42,11 +43,17 @@ public class RequesterAgentBehaviour extends AchieveREInitiator {
     @Override
     protected void handleInform(ACLMessage msg) {
         WorkerAgent agent = (WorkerAgent) this.getAgent();
+        DiggerAgent digger = null;
+        if(agent instanceof DiggerAgent)
+            digger = (DiggerAgent) agent;
         agent.log("INFORM received from " + ((AID) msg.getSender()).getLocalName());
         try {
             GameSettings game = (GameSettings) msg.getContentObject();
-            System.out.println(game);
-            agent.setGame(game);
+            System.out.println(game.getShortString());
+            if(digger != null)
+                digger.setGame(game);
+            else
+                agent.setGame(game);
             agent.log(game.getShortString());
             agent.setRow(agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,agent.getName().indexOf("@")))).getRow());
             agent.setColumn(agent.getGame().getAgentList().get(agent.getType()).get(Integer.valueOf(agent.getName().substring(3,agent.getName().indexOf("@")))).getCol());

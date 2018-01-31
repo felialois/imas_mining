@@ -56,6 +56,7 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
         } else if(msg.getContent().equals(MessageContent.RANDOM)) {
             agent.setMovement(MessageContent.RANDOM);
             agent.log("Set movement random");
+            agent.actionTurn();
         } else if(content.contains(MessageContent.CONTRACT_REJECT)) {
             agent.log("Bid Lost");
             agent.restartContractNetBehaviour();
@@ -74,6 +75,7 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
                 agent.setMovement(FOLLOW_PROS);
                 agent.setAssignedProspector((AID)msg.getContentObject());
                 agent.log("Following prospector");
+                agent.actionTurn();
             } else if(msg.getContentObject() instanceof GameSettings){
                 agent.setGame((GameSettings)msg.getContentObject());
                 agent.actionTurn();

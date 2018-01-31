@@ -46,7 +46,10 @@ public class CyclicMessagingPros extends CyclicBehaviour{
         ProspectorAgent agent = (ProspectorAgent)this.getAgent();
         try {
             if(msg.getContentObject() instanceof AID) {
-                agent.setAssignedDigger((AID)msg.getContentObject());
+                if(!agent.diggerIsAssigned()){
+                    agent.setAssignedDigger((AID)msg.getContentObject());
+                    agent.actionTurn();
+                }
             } else if(msg.getContentObject() instanceof GameSettings){
                 agent.setGame((GameSettings)msg.getContentObject());
                 agent.actualizePos();

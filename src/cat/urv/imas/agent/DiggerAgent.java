@@ -130,11 +130,13 @@ public class DiggerAgent extends WorkerAgent {
                 MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
                 MessageTemplate.MatchPerformative(ACLMessage.CFP));
         
-        ParallelBehaviour parallelBehaviour = new ParallelBehaviour();
-        parallelBehaviour.addSubBehaviour(new RequesterBehaviorDigger(this, mapRequest));
-        parallelBehaviour.addSubBehaviour(new CyclicMessagingDigger(this));
-        parallelBehaviour.addSubBehaviour(new ContractNetResponderBehaviour(this, template));
-        this.addBehaviour(parallelBehaviour);
+        SequentialBehaviour seq_behaviour = new SequentialBehaviour();
+        seq_behaviour.addSubBehaviour(new RequesterBehaviorDigger(this, mapRequest));
+        ParallelBehaviour par_behaviour = new ParallelBehaviour();
+        par_behaviour.addSubBehaviour(new CyclicMessagingDigger(this));
+        par_behaviour.addSubBehaviour(new ContractNetResponderBehaviour(this, template));
+        seq_behaviour.addSubBehaviour(par_behaviour);
+        this.addBehaviour(seq_behaviour);
         
     }
     
@@ -200,9 +202,8 @@ public class DiggerAgent extends WorkerAgent {
                 metalCarried.put(type, 0);
         }
         
-        actualizePos();
-        
         super.setGame(game);
+        actualizePos();
     }
     
     public void actualizePos() {

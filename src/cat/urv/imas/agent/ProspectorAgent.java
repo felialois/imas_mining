@@ -58,6 +58,7 @@ public class ProspectorAgent extends WorkerAgent{
     
     @Override
     public void setup(){
+        assigned_digger = null;
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
         /* ********************************************************************/
@@ -138,6 +139,10 @@ public class ProspectorAgent extends WorkerAgent{
         this.assigned_digger = digger;
     }
     
+    public boolean diggerIsAssigned() {
+        return this.assigned_digger != null;
+    }
+    
     public AID getAssignedDigger() {
         return assigned_digger;
     }
@@ -181,7 +186,8 @@ public class ProspectorAgent extends WorkerAgent{
         } else{
             int[] newPos = randomMovementProspector();
             try {
-                informDigger(newPos[0],newPos[1]);
+                if(this.assigned_digger != null)
+                    informDigger(newPos[0],newPos[1]);
                 informSystem(newPos[0],newPos[1]);
             } catch (Exception ex) {
                 ex.printStackTrace();
