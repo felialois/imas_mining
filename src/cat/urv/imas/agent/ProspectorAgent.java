@@ -223,7 +223,7 @@ public class ProspectorAgent extends WorkerAgent{
         pos[1]=this.row;
         pos[2]=x;
         pos[3]=y;
-        informPosition.setContentObject(pos);
+        informPosition.setContent(pos[0]+","+pos[1]+","+pos[2]+","+pos[3]);
         this.send(informPosition);
         
     }
