@@ -65,7 +65,7 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
                     agent.getMovement().equals(FOLLOW_PROS)) {
                 String[] pos = content.substring(MessageContent.MOVE_TO.length() + 1).split(",");
                 GameSettings game = agent.getGame();
-                Cell nextMov = AStar.shortestPath((Node)game.get(agent.getRow(), agent.getColumn()),
+                Cell nextMov = AStar.shortestPath(new Node(game.get(agent.getRow(), agent.getColumn())),
                     (Node)game.get(Integer.parseInt(pos[0]), Integer.parseInt(pos[1])), 
                     game.getMap());
                 agent.sendMovToSys(nextMov.getRow(), nextMov.getCol());
