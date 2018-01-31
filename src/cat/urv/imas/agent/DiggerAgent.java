@@ -273,8 +273,6 @@ public class DiggerAgent extends WorkerAgent {
     }
     
     public void actionTurn() {
-        ACLMessage move = new ACLMessage(ACLMessage.INFORM);
-        move.addReceiver(system);
         switch (actState){
             case MOVING:
                 if(movement.equals(MessageContent.RANDOM)) {
@@ -350,6 +348,5 @@ public class DiggerAgent extends WorkerAgent {
             default:
                 break;
         }
-        send(move);
     }
 }

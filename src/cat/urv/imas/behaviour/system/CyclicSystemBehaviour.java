@@ -54,7 +54,7 @@ public class CyclicSystemBehaviour extends CyclicBehaviour{
             return;
         
         String content = msg.getContent();
-        System.out.println("Received message from " + msg.getSender());
+        agent.log("Received message from " + msg.getSender());
         if(content != null && content.equals(MessageContent.GET_MAP)) {
             // Agents wants a map
             ACLMessage reply = msg.createReply();
