@@ -183,17 +183,17 @@ public class ProspectorAgent extends WorkerAgent{
             for(Cell mtl: fieldsWithMetal){
                 informCoordinator(mtl.getCol(),mtl.getRow());
             }
-        } else{
-            int[] newPos = randomMovementProspector();
-            try {
-                if(this.assigned_digger != null)
-                    informDigger(newPos[0],newPos[1]);
-                informSystem(newPos[0],newPos[1]);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
         }
-        
+        int[] newPos = randomMovementProspector();
+        try {
+            if (this.assigned_digger != null) {
+                informDigger(newPos[0], newPos[1]);
+            }
+            informSystem(newPos[0], newPos[1]);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
         
     }
     
