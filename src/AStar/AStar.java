@@ -23,7 +23,7 @@ public class AStar {
         this.endingPoint=endingPoint;
     }
     
-    public ArrayList<Node> shortestPath(Node startingPoint,Node endingPoint,Cell[][] map)
+    public Cell shortestPath(Node startingPoint,Node endingPoint,Cell[][] map)
     {
         ArrayList<Node> open = new ArrayList<Node>();
         ArrayList<Node> closed = new ArrayList<Node>();
@@ -85,7 +85,9 @@ public class AStar {
                 //If the succesor is the goal stop the search
                 if(succesors.get(j).equals(endingPoint))
                 {
-                    break;
+                    //For us is only interesting the row and column of the first movement
+                    //Return the first visited cell after the initial one
+                    return open.get(1);
                 }
                 
                 //g+distance between succesor and q, which is always 1
@@ -135,8 +137,9 @@ public class AStar {
         }
                 
     }
-        
-    return open;
+    
+    //No path between the initial cell and the final cell was found
+    return null;
 
     }
 }
