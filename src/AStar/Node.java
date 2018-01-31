@@ -5,6 +5,7 @@
  */
 package AStar;
 
+import cat.urv.imas.gui.CellVisualizer;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.CellType;
 
@@ -12,7 +13,7 @@ import cat.urv.imas.map.CellType;
  *
  * @author Antonio
  */
-public abstract class Node extends Cell{
+public class Node extends Cell{
     
     private float f,g,h;
     private Node parent;
@@ -24,6 +25,14 @@ public abstract class Node extends Cell{
         this.g=g;
         this.h=h;
         this.parent=parent;
+    }
+    
+    public Node(Cell cell){
+         super(CellType.PATH,cell.getRow(),cell.getCol());
+        this.f= 0f;
+        this.g= 0f;
+        this.h= 0f;
+        this.parent = null;
     }
     
     public float getF()
@@ -64,5 +73,10 @@ public abstract class Node extends Cell{
     public void setParent(Node parent)
     {
         this.parent=parent;
+    }
+
+    @Override
+    public void draw(CellVisualizer visual) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
