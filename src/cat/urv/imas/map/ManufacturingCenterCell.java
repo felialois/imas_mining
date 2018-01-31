@@ -64,4 +64,11 @@ public class ManufacturingCenterCell extends Cell {
         return price + ":" + metal.getShortString();
     }
 
+    public int getPrice() {
+        return price;
+    }
+    
+    public MetalType getMetal() {
+        return metal;
+    }
 }

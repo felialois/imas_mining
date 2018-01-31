@@ -5,11 +5,16 @@
 */
 package cat.urv.imas.agent;
 
+import AStar.AStar;
+import AStar.Node;
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.agent.CyclicMessagingDigger;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorDigger;
 import cat.urv.imas.behaviour.coordinator.ContractNetResponderBehaviour;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.CellType;
+import cat.urv.imas.map.FieldCell;
+import cat.urv.imas.map.ManufacturingCenterCell;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
@@ -28,6 +33,7 @@ import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
@@ -181,16 +187,18 @@ public class DiggerAgent extends WorkerAgent {
         int totalMetal = 0;
         for(int val: metalCarried.values())
             totalMetal += val;
-        return (maxCapacity-totalMetal) / Math.abs(x-this.getRow()) + Math.abs(y-this.getColumn());
+        return (maxCapacity-totalMetal) / (Math.abs(x-this.getRow()) + Math.abs(y-this.getColumn()));
     }
     
     @Override
     public void setGame(GameSettings game) {
-        maxCapacity = game.getDiggersCapacity();
-        metalCarried = new HashMap();
-        MetalType[] types = game.getManufacturingCenterMetalType();
-        for(MetalType type: types)
-            metalCarried.put(type, 0);
+        if(metalCarried == null) {
+            maxCapacity = game.getDiggersCapacity();
+            metalCarried = new HashMap();
+            MetalType[] types = game.getManufacturingCenterMetalType();
+            for(MetalType type: types)
+                metalCarried.put(type, 0);
+        }
         
         actualizePos();
         
@@ -236,6 +244,24 @@ public class DiggerAgent extends WorkerAgent {
         this.addBehaviour(new ContractNetResponderBehaviour(this, template));
     }
     
+    public void chooseMC() {
+        List<Cell> mcs = game.getCellsOfType().get(CellType.MANUFACTURING_CENTER);
+        ManufacturingCenterCell bestMc = null;
+        double bestValue = 0.0;
+        for(Cell mc: mcs) {
+            double price = ((ManufacturingCenterCell)mc).getPrice();
+            MetalType type = ((ManufacturingCenterCell)mc).getMetal();
+            double value = price * metalCarried.get(type)
+                    / ((Math.abs(mc.getRow()-this.getRow())
+                    + Math.abs(mc.getCol()-this.getColumn())));
+            if(value > bestValue) {
+                bestValue = value;
+                bestMc = (ManufacturingCenterCell)mc;
+            }
+        }
+        setMovingToPos(bestMc.getRow(), bestMc.getCol());
+    }
+    
     public void sendMovToSys(int newRow, int newCol) {
         ACLMessage msgSys = new ACLMessage(ACLMessage.INFORM);
         msgSys.addReceiver(system);
@@ -270,17 +296,64 @@ public class DiggerAgent extends WorkerAgent {
                 break;
             case DIGGING:
                 // Dig one metal and add it to the list
+                Map<MetalType, Integer> metal= ((FieldCell)game.get(movingToPos[0], movingToPos[1])).getMetal();
+                for(MetalType type: metal.keySet()) {
+                    if(metal.get(type) > 0)
+                        extractMetal(type);
+                }
+                // Send a message to the system with the dig
+                ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                msg.addReceiver(system);
+                msg.setContent(MessageContent.EXTRACT_METAL + " " +
+                        movingToPos[0] + "," + movingToPos[1]);
+                send(msg);
+                log("Dig sent");
                 // Check if the digger can load more or there are more metal
                 // If the digger cannot dig more change the state and decide MC
-                // Send a message to the system with the dig
+                int metalLeft = 0;
+                for(MetalType type: metal.keySet())
+                    metalLeft += metal.get(type);
+                if(metalLeft < 0 || hasSpaceAvailable()) {
+                    setState(DiggerState.GOING_TO_DIG);
+                    chooseMC();
+                }
                 // Send a message to the system with the movement
+                sendMovToSys(row, column);
                 break;
             case GOING_TO_DIG:
                 // Apply AStar
+                Cell nextMovDig = AStar.shortestPath((Node)game.get(row, column),
+                    (Node)game.get(movingToPos[0], movingToPos[1]), 
+                    game.getMap());
                 // Send the movement to the system, going to the digging point
+                sendMovToSys(nextMovDig.getRow(), nextMovDig.getCol());
+                // Check if next movement is close to the digging point
+                if(Math.abs(nextMovDig.getRow() - movingToPos[0]) <= 1 &&
+                        Math.abs(nextMovDig.getCol() - movingToPos[1]) <= 1)
+                    setState(DiggerState.DIGGING);
                 break;
             case RETRIEVING_METAL:
-                // Send the movement to the system, going to the best MC
+                // Check if it is close to the MC
+                if(Math.abs(row - movingToPos[0]) <= 1 &&
+                        Math.abs(column - movingToPos[1]) <= 1) {
+                    ManufacturingCenterCell mc = (ManufacturingCenterCell)game.get(movingToPos[0], movingToPos[1]);
+                    ACLMessage msgMetalMc = new ACLMessage(ACLMessage.INFORM);
+                    msgMetalMc.addReceiver(system);
+                    msgMetalMc.setContent(MessageContent.METAL_TO_MC + " " + 
+                            metalCarried.get(mc.getMetal()) + "," + movingToPos[0] +
+                            movingToPos[1]);
+                    send(msgMetalMc);
+                    log("Left metal to MC");
+                    setState(DiggerState.MOVING);
+                    sendMovToSys(row, column);
+                } else{
+                    // Apply AStar
+                    Cell nextMovMc = AStar.shortestPath((Node)game.get(row, column),
+                        (Node)game.get(movingToPos[0], movingToPos[1]), 
+                        game.getMap());
+                    // Send the movement to the system, going to the best MC
+                    sendMovToSys(nextMovMc.getRow(), nextMovMc.getCol());
+                }
             default:
                 break;
         }

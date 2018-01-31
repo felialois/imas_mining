@@ -1,9 +1,9 @@
 
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
 package cat.urv.imas.agent;
 
 import static cat.urv.imas.agent.ImasAgent.OWNER;
@@ -61,7 +61,7 @@ public class ProspectorAgent extends WorkerAgent{
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
         /* ********************************************************************/
-
+        
         // Register the agent to the DF
         ServiceDescription sd1 = new ServiceDescription();
         sd1.setType(AgentType.PROSPECTOR.toString());
@@ -93,7 +93,7 @@ public class ProspectorAgent extends WorkerAgent{
         do {
             ready = receive();
         } while(ready == null ||
-            !MessageContent.READY.equals(ready.getContent()));
+                !MessageContent.READY.equals(ready.getContent()));
         log("Prospector coor ready");
         
         // Send message to get the map
@@ -108,7 +108,7 @@ public class ProspectorAgent extends WorkerAgent{
             log("error in message creation prospector");
             e.printStackTrace();
         }
-       
+        
         RequesterBehaviorProspector rbp = new RequesterBehaviorProspector(this, mapRequest);
         
         // Send message to get the area
@@ -116,14 +116,14 @@ public class ProspectorAgent extends WorkerAgent{
         areaRequest.clearAllReceiver();
         areaRequest.addReceiver(this.coordinator);
         areaRequest.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-         try {
+        try {
             areaRequest.setContent(MessageContent.GET_AREA);
             log("Request message content");
         } catch (Exception e) {
             log("error in message creation prospector");
             e.printStackTrace();
         }
-         
+        
         RequesterBehaviorProspector getAreaBehavior
                 = new RequesterBehaviorProspector(this, areaRequest);
         
@@ -143,21 +143,21 @@ public class ProspectorAgent extends WorkerAgent{
     }
     
     public int[] randomMovementProspector(){
-  int x = getRow();
+        int x = getRow();
         int y = getColumn();
         Random r = new Random();
         List<Cell> possibleMovs = new ArrayList<Cell>();
         // Up
-        if(x > 0 && game.get(x-1, y) instanceof PathCell)
+        if(x > min_x && game.get(x-1, y) instanceof PathCell)
             possibleMovs.add(game.get(x, y));
         // Down
-        if(x < game.getMap().length && game.get(x+1, y) instanceof PathCell)
+        if(x < max_x && game.get(x+1, y) instanceof PathCell)
             possibleMovs.add(game.get(x, y));
         // Left
-        if(y > 0 && game.get(x, y-1) instanceof PathCell)
+        if(y > min_y && game.get(x, y-1) instanceof PathCell)
             possibleMovs.add(game.get(x, y));
         // Right
-        if(y < game.getMap()[0].length && game.get(x, y+1) instanceof PathCell)
+        if(y < max_y && game.get(x, y+1) instanceof PathCell)
             possibleMovs.add(game.get(x, y));
         Cell c = possibleMovs.get(r.nextInt(possibleMovs.size()));
         return new int[]{c.getRow(), c.getCol()};
@@ -205,7 +205,7 @@ public class ProspectorAgent extends WorkerAgent{
         metalInfo.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
         metalInfo.setContent(MessageContent.METAL+x+","+y);
         this.send(metalInfo);
-                
+        
     }
     
     public void informSystem(int x, int y) throws IOException{
@@ -219,6 +219,6 @@ public class ProspectorAgent extends WorkerAgent{
         pos[3]=y;
         informPosition.setContentObject(pos);
         this.send(informPosition);
-                
+        
     }
 }

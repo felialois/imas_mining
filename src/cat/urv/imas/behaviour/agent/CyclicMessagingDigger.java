@@ -51,6 +51,7 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
             String[] location = content.replace(MessageContent.CONTRACT_ASIGN, "").split(",");
             agent.log("Bid Won Location "+location[0]+" ,"+location[1]);
             agent.setState(DiggerAgent.DiggerState.GOING_TO_DIG);
+            agent.setMovingToPos(Integer.parseInt(location[0]), Integer.parseInt(location[1]));
             agent.restartContractNetBehaviour();
         } else if(msg.getContent().equals(MessageContent.RANDOM)) {
             agent.setMovement(MessageContent.RANDOM);
@@ -73,6 +74,9 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
                 agent.setMovement(FOLLOW_PROS);
                 agent.setAssignedProspector((AID)msg.getContentObject());
                 agent.log("Following prospector");
+            } else if(msg.getContentObject() instanceof GameSettings){
+                agent.setGame((GameSettings)msg.getContentObject());
+                agent.actionTurn();
             } else{
                 agent.errorLog("Error: " + content);
             }

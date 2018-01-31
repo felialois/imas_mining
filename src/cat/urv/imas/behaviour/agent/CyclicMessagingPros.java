@@ -9,6 +9,7 @@ import cat.urv.imas.behaviour.coordinator.*;
 import cat.urv.imas.agent.AgentType;
 import cat.urv.imas.agent.ProspectorAgent;
 import cat.urv.imas.agent.ProspectorCoordinatorAgent;
+import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
 import jade.core.Agent;
@@ -46,6 +47,10 @@ public class CyclicMessagingPros extends CyclicBehaviour{
         try {
             if(msg.getContentObject() instanceof AID) {
                 agent.setAssignedDigger((AID)msg.getContentObject());
+            } else if(msg.getContentObject() instanceof GameSettings){
+                agent.setGame((GameSettings)msg.getContentObject());
+                agent.actualizePos();
+                agent.actionTurn();
             } else{
                 agent.errorLog("Error: " + content);
             }
