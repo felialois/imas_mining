@@ -36,15 +36,6 @@ public class CyclicSystemBehaviour extends CyclicBehaviour{
     public CyclicSystemBehaviour(Agent a) {
         super(a);
         SystemAgent agent = (SystemAgent) a;
-    }
-    
-    @Override
-    public void action() {
-        SystemAgent agent = (SystemAgent)this.getAgent();
-        
-        ACLMessage msg = myAgent.receive();
-        if(msg == null)
-            return;
         
         receivedDiggers = 0;
         receivedProspectors = 0;
@@ -52,8 +43,18 @@ public class CyclicSystemBehaviour extends CyclicBehaviour{
         nextDiggerPos = new int[agent.getNumDiggers()][2];
         prevProsPos = new int[agent.getNumProspectors()][2];
         nextProsPos = new int[agent.getNumProspectors()][2];
+    }
+    
+    @Override
+    public void action() {
+        SystemAgent agent = (SystemAgent)this.getAgent();
+        
+        ACLMessage msg = agent.receive();
+        if(msg == null)
+            return;
         
         String content = msg.getContent();
+        System.out.println("Received message from " + msg.getSender());
         if(content.equals(MessageContent.GET_MAP)) {
             // Agents wants a map
             ACLMessage reply = msg.createReply();
@@ -69,16 +70,31 @@ public class CyclicSystemBehaviour extends CyclicBehaviour{
             }
             agent.log("Response being prepared");
             agent.send(reply);
+            
+            reply = msg.createReply();
+            reply.setPerformative(ACLMessage.INFORM);
+            
+            try {
+                agent.addElementsForThisSimulationStep();
+                reply.setContentObject(agent.getGame());
+            } catch (Exception e) {
+                reply.setPerformative(ACLMessage.FAILURE);
+                agent.errorLog(e.toString());
+                e.printStackTrace();
+            }
+            agent.log("Game settings sent");
+            agent.send(reply);
         } else if(content.startsWith(MessageContent.EXTRACT_METAL)) {
             String coord_string = content.substring(MessageContent.EXTRACT_METAL.length() + 1);
             String[] coord = coord_string.split(",");
+            agent.log("Metal extraction");
             agent.extractMetal(Integer.parseInt(coord[0]), Integer.parseInt(coord[1]));
         } else if(content.startsWith(MessageContent.METAL_TO_MC)) {
             String coord_string = content.substring(MessageContent.METAL_TO_MC.length() + 1);
             String[] coord = coord_string.split(",");
+            agent.log("Metal to MC");
             agent.metalToMC(Integer.parseInt(coord[0]), Integer.parseInt(coord[1]), Integer.parseInt(coord[2]));
         } else{
-            
             // Waits for the message of all of the workers
             try {
                 int[] pos = (int[])msg.getContentObject();
@@ -145,6 +161,14 @@ public class CyclicSystemBehaviour extends CyclicBehaviour{
                     msg.addReceiver(prospectors[i].getName());
                 
                 agent.send(msg);
+                
+                
+                receivedDiggers = 0;
+                receivedProspectors = 0;
+                prevDiggerPos = new int[agent.getNumDiggers()][2];
+                nextDiggerPos = new int[agent.getNumDiggers()][2];
+                prevProsPos = new int[agent.getNumProspectors()][2];
+                nextProsPos = new int[agent.getNumProspectors()][2];
             } catch (IOException e1) {
                 e1.printStackTrace();
             } catch (FIPAException e2) {

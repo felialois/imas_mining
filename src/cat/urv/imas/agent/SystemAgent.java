@@ -181,10 +181,10 @@ public class SystemAgent extends ImasAgent {
         ready.addReceiver(this.coordinatorAgent);
         send(ready);
         
-        SequentialBehaviour seq_behaviour = new SequentialBehaviour();
-        seq_behaviour.addSubBehaviour(new RequestResponseBehaviour(this, mt));
-        seq_behaviour.addSubBehaviour(new CyclicSystemBehaviour(this));
-        this.addBehaviour(seq_behaviour);
+        //SequentialBehaviour seq_behaviour = new SequentialBehaviour();
+        //seq_behaviour.addSubBehaviour(new RequestResponseBehaviour(this, mt));
+        //seq_behaviour.addSubBehaviour(new CyclicSystemBehaviour(this));
+        this.addBehaviour(new CyclicSystemBehaviour(this));
     }
     
     public void actualize(int[][] prevDiggerPos, int[][] nextDiggerPos,
