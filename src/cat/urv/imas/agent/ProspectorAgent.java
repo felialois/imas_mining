@@ -10,6 +10,7 @@ import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.agent.CyclicMessagingPros;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorProspector;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
@@ -21,7 +22,13 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -136,24 +143,24 @@ public class ProspectorAgent extends WorkerAgent{
     }
     
     public int[] randomMovementProspector(){
-        int randomNumRow = ThreadLocalRandom.current().nextInt(-1, 2);
-        int randomNumCol = ThreadLocalRandom.current().nextInt(-1, 2);
-        int newRow=this.getRow()+randomNumRow;
-        int newCol=this.getColumn()+randomNumCol;
-        int result[] = new int[2];
-        
-        if(this.getGame().getMap()[newRow][newCol].getCellType().toString().equals("PATH") &
-                newCol >= this.min_x & newCol <= this.max_x & newRow >= this.min_y & newRow <= this.max_y)
-        {
-            this.log("ROW "+this.getRow()+" COLUMN "+this.getColumn());
-                                                
-            result[0] = newRow;
-            result[1] = newCol;
-            
-            return result;
-        }
-        
-        return null;
+  int x = getRow();
+        int y = getColumn();
+        Random r = new Random();
+        List<Cell> possibleMovs = new ArrayList<Cell>();
+        // Up
+        if(x > 0 && game.get(x-1, y) instanceof PathCell)
+            possibleMovs.add(game.get(x, y));
+        // Down
+        if(x < game.getMap().length && game.get(x+1, y) instanceof PathCell)
+            possibleMovs.add(game.get(x, y));
+        // Left
+        if(y > 0 && game.get(x, y-1) instanceof PathCell)
+            possibleMovs.add(game.get(x, y));
+        // Right
+        if(y < game.getMap()[0].length && game.get(x, y+1) instanceof PathCell)
+            possibleMovs.add(game.get(x, y));
+        Cell c = possibleMovs.get(r.nextInt(possibleMovs.size()));
+        return new int[]{c.getRow(), c.getCol()};
     }
     
     public void actualizePos() {
@@ -165,6 +172,53 @@ public class ProspectorAgent extends WorkerAgent{
     }
     
     public void actionTurn() {
+        Cell currentCell = this.game.getMap()[column][row];
+        Cell[] fieldsWithMetal = GameSettings.detectFieldsWithMetal(this.game.getMap(), row, column);
+        if(fieldsWithMetal.length>0){
+            for(Cell mtl: fieldsWithMetal){
+                informCoordinator(mtl.getCol(),mtl.getRow());
+            }
+        } else{
+            int[] newPos = randomMovementProspector();
+            try {
+                informDigger(newPos[0],newPos[1]);
+                informSystem(newPos[0],newPos[1]);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
         
+        
+    }
+    
+    public void informDigger(int x, int y){
+        ACLMessage informPosition = new ACLMessage(ACLMessage.INFORM);
+        informPosition.addReceiver(this.assigned_digger);
+        informPosition.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+        informPosition.setContent(MessageContent.MOVE_TO+" "+x+","+y);
+        this.send(informPosition);
+    }
+    
+    public void informCoordinator(int x, int y){
+        ACLMessage metalInfo = new ACLMessage(ACLMessage.INFORM);
+        metalInfo.addReceiver(this.coordinator);
+        metalInfo.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+        metalInfo.setContent(MessageContent.METAL+x+","+y);
+        this.send(metalInfo);
+                
+    }
+    
+    public void informSystem(int x, int y) throws IOException{
+        ACLMessage informPosition = new ACLMessage(ACLMessage.INFORM);
+        informPosition.addReceiver(this.system);
+        informPosition.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+        int[] pos = new int[4];
+        pos[0]=this.column;
+        pos[1]=this.row;
+        pos[2]=x;
+        pos[3]=y;
+        informPosition.setContentObject(pos);
+        this.send(informPosition);
+                
     }
 }

@@ -191,7 +191,7 @@ public class GameSettings implements java.io.Serializable {
         return map;
     }
 
-    public Cell[] detectFieldsWithMetal(int row, int col) {
+    public static Cell[] detectFieldsWithMetal(Cell[][] map, int row, int col) {
         List<Cell> cells = new ArrayList<>();
         int[] adjacentCellsX = new int[4];
         int[] adjacentCellsY = new int[4];
