@@ -5,14 +5,8 @@
  */
 package cat.urv.imas.behaviour.agent;
 
-import cat.urv.imas.agent.DiggerAgent;
-import cat.urv.imas.agent.ProspectorAgent;
 import cat.urv.imas.agent.WorkerAgent;
-import cat.urv.imas.onthology.MessageContent;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.UnreadableException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

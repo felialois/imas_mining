@@ -3,7 +3,7 @@
 * To change this template file, choose Tools | Templates
 * and open the template in the editor.
 */
-package AStar;
+package Movement;
 
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.PathCell;
@@ -45,13 +45,8 @@ public class BreadthFirstSearch {
         q.add(new Node(startingPoint, null));
         Node actNode = null;
         
-        //System.out.println("NEW NODE");
-        //System.out.println("START "+startingPoint.getRow()+" "+startingPoint.getCol());
-        //System.out.println("END "+endingPoint.getRow()+" "+endingPoint.getCol());
-        
         while(!q.isEmpty()) {
             actNode = q.poll();
-            //System.out.println("ACTUAL "+actNode.cell.getRow()+" "+actNode.cell.getCol());
 
             if(actNode.cell.equals(endingPoint)){
                 break;

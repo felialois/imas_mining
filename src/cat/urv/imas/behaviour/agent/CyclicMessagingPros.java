@@ -5,24 +5,13 @@
  */
 package cat.urv.imas.behaviour.agent;
 
-import cat.urv.imas.behaviour.coordinator.*;
-import cat.urv.imas.agent.AgentType;
 import cat.urv.imas.agent.ProspectorAgent;
-import cat.urv.imas.agent.ProspectorCoordinatorAgent;
 import cat.urv.imas.onthology.GameSettings;
-import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.AMSAgentDescription;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.SearchConstraints;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,8 +51,7 @@ public class CyclicMessagingPros extends CyclicBehaviour{
             Logger.getLogger(CyclicMessagingPros.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        int result[] = new int[2];
-        result=agent.randomMovementProspector();
+        int result[] = agent.randomMovementProspector();
             
         if(result!=null)
         {

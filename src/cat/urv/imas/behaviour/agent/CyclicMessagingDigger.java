@@ -5,9 +5,7 @@
 */
 package cat.urv.imas.behaviour.agent;
 
-import AStar.AStar;
-import AStar.BreadthFirstSearch;
-import AStar.Node;
+import Movement.BreadthFirstSearch;
 import cat.urv.imas.agent.DiggerAgent;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.GameSettings;
@@ -17,7 +15,6 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
-import java.io.IOException;
 
 /**
  *
@@ -90,8 +87,7 @@ public class CyclicMessagingDigger extends CyclicBehaviour{
         
         if(agent.getMovement().equals(MessageContent.RANDOM))
         {
-            int result[] = new int[2];
-            result=agent.randomMovementDigger();
+            int result[] = agent.randomMovementDigger();
             
             if(result!=null)
             {

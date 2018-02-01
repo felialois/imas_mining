@@ -290,13 +290,6 @@ public class DiggerCoordinatorAgent extends CoordinatorAgent {
         msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
         msg.setContent(MessageContent.CONTRACT_PROPOSE+xLocation+","+yLocation);
         
-//        this.removeBehaviour(seq_behaviour);
-//        
-//        seq_behaviour = new ParallelBehaviour();
-//        ParallelBehaviour par = (ParallelBehaviour) seq_behaviour;
-//        par.addSubBehaviour(new ContractNetInitiatorBehaviour(this, msg));
-//        par.addSubBehaviour(new CyclicBehaviourDiggerCoor(this));
-        
         this.addBehaviour(new ContractNetInitiatorBehaviour(this, msg));
     }
     

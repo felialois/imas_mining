@@ -14,8 +14,6 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
 import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 /**

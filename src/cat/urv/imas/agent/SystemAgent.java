@@ -21,16 +21,13 @@ import cat.urv.imas.behaviour.system.CyclicSystemBehaviour;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.gui.GraphicInterface;
-import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.CellType;
 import cat.urv.imas.map.FieldCell;
-import cat.urv.imas.map.ManufacturingCenterCell;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.InfoAgent;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.*;
-import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
@@ -181,9 +178,6 @@ public class SystemAgent extends ImasAgent {
         ready.addReceiver(this.coordinatorAgent);
         send(ready);
         
-        //SequentialBehaviour seq_behaviour = new SequentialBehaviour();
-        //seq_behaviour.addSubBehaviour(new RequestResponseBehaviour(this, mt));
-        //seq_behaviour.addSubBehaviour(new CyclicSystemBehaviour(this));
         this.addBehaviour(new CyclicSystemBehaviour(this));
     }
     

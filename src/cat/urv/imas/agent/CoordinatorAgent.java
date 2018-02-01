@@ -17,13 +17,10 @@
  */
 package cat.urv.imas.agent;
 
-import cat.urv.imas.behaviour.coordinator.RequesterBehaviour;
 import cat.urv.imas.behaviour.coordinator.RequesterBehaviourCoor;
 import cat.urv.imas.onthology.GameSettings;
-import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.*;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;

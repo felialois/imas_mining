@@ -7,7 +7,6 @@ package cat.urv.imas.behaviour.coordinator;
 
 import cat.urv.imas.agent.AgentType;
 import cat.urv.imas.agent.CoordinatorAgent;
-import cat.urv.imas.agent.DiggerCoordinatorAgent;
 import cat.urv.imas.onthology.MessageContent;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;

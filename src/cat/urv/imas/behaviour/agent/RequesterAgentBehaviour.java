@@ -5,7 +5,6 @@
  */
 package cat.urv.imas.behaviour.agent;
 
-import cat.urv.imas.agent.CoordinatorAgent;
 import cat.urv.imas.agent.DiggerAgent;
 import cat.urv.imas.agent.WorkerAgent;
 import cat.urv.imas.onthology.GameSettings;

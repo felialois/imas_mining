@@ -5,9 +5,7 @@
 */
 package cat.urv.imas.agent;
 
-import AStar.AStar;
-import AStar.BreadthFirstSearch;
-import AStar.Node;
+import Movement.BreadthFirstSearch;
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.agent.CyclicMessagingDigger;
 import cat.urv.imas.behaviour.agent.RequesterBehaviorDigger;
@@ -30,15 +28,10 @@ import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Random;
 
 /**

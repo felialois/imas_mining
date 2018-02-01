@@ -14,7 +14,6 @@ import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.AID;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -26,9 +25,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -177,7 +173,6 @@ public class ProspectorAgent extends WorkerAgent{
     }
     
     public void actionTurn() {
-        Cell currentCell = this.game.getMap()[column][row];
         Cell[] fieldsWithMetal = GameSettings.detectFieldsWithMetal(this.game.getMap(), row, column);
         if(fieldsWithMetal.length>0){
             for(Cell mtl: fieldsWithMetal){
@@ -190,8 +185,8 @@ public class ProspectorAgent extends WorkerAgent{
                 informDigger(newPos[0], newPos[1]);
             }
             informSystem(newPos[0], newPos[1]);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         

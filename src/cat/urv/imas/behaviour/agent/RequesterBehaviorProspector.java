@@ -5,16 +5,10 @@
  */
 package cat.urv.imas.behaviour.agent;
 
-import cat.urv.imas.agent.AgentType;
-import cat.urv.imas.agent.CoordinatorAgent;
 import cat.urv.imas.agent.ProspectorAgent;
-import cat.urv.imas.agent.UtilsAgents;
 import cat.urv.imas.agent.WorkerAgent;
-import cat.urv.imas.behaviour.coordinator.RequesterBehaviour;
 import cat.urv.imas.onthology.MessageContent;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-import java.util.List;
 
 /**
  *
